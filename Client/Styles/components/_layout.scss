@@ -1,0 +1,188 @@
+@mixin fullwidth-with-centred-content {
+    width: 100%;
+    min-width: 320px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: row;
+    flex-direction: row;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    & > * {
+        //margin: 0 1rem;
+        -webkit-box-flex: 1;
+        -ms-flex-positive: 1;
+        flex-grow: 1;
+        max-width: 1000px;
+    }
+}
+
+html {
+    font-family: font-face;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: $background-colour;
+}
+
+.primary-nav-container {
+    @include fullwidth-with-centred-content;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    left: 0;
+    background-color: $medium-grey;
+    box-shadow: $default-shadow;
+    color: $white;
+    z-index: 100;
+}
+
+.site-header-container {
+    @include fullwidth-with-centred-content;
+    -webkit-box-shadow: $default-shadow;
+    box-shadow: $default-shadow;
+}
+
+header.site-header {
+    @include responsive-content-padding;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: row;
+    flex-direction: row;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+
+    img {
+        width: 8rem;
+        height: auto;
+    }
+}
+
+.site-header-right {
+    text-align: right;
+    min-width: 130px;
+    font-size: 0.8rem;
+    line-height: 0.5rem;
+}
+
+.content-container {
+    @include fullwidth-with-centred-content;
+}
+
+.content {
+    @include responsive-content-padding;
+    display: grid;
+    grid-template-rows: repeat(auto);
+    @include responsive-grid-gap;
+
+}
+
+.footer-container {
+    @include fullwidth-with-centred-content;
+}
+
+footer.site-footer {
+    text-align: center;
+    font-size: 0.9rem;
+    p, a {
+        font-family: Roboto;
+    }
+    .providing-nhs-services {
+        margin: 2rem;
+    }
+}
+
+.display-on-mobile {
+    display: none;
+}
+
+@media only screen and (min-width: $large-mobile-screen-size) {
+    .display-on-mobile {
+        display: initial;
+    }
+    header.site-header {
+        img {
+            width: 10rem;
+        }
+    }
+}
+
+@media only screen and (min-width: $tablet-screen-size) {
+    header.site-header {
+        img {
+            width: 10rem;
+        }
+    }
+}
+
+@media only screen and (min-width: $desktop-screen-size) {
+    header.site-header {
+        img {
+            width: 10rem;
+        }
+    }
+}
+
+//IE Hacks
+
+@media all and (-ms-high-contrast: none) {
+    header.site-header {
+        min-width: 1000px;
+
+        img {
+            width: 192px;
+            height: 143px;
+        }
+    }
+
+    .content {
+        min-width: 1000px;
+        display: flex;
+        flex-direction: column;
+        & > .card-row:not(:last-child) {
+            margin-bottom: 22px;
+        }
+        & > .layout-element:not(:last-child) {
+            margin-bottom: 22px;
+        }
+    }
+
+    .card {
+        flex-basis: 0;
+        flex: 1 1 0px;
+    }
+
+    .useful-menu {
+        & > .menu-secondary-container > ul {
+            width: 1000px !important;
+            display: flex;
+            flex-direction: row;
+        }
+        & > .menu-secondary-container > ul > .button-text {
+            flex-basis: 0;
+            flex: 1 1 0px;
+        }
+        & > .menu-secondary-container > ul > li.button-text {
+            flex-basis: 0;
+            flex: 1 1 0px;
+        }
+        & > .menu-secondary-container > ul > .button-text:not(:last-child) {
+            margin-right: 22px;
+        }
+    }
+
+    @media only screen and (min-width: $large-mobile-screen-size) {
+        .display-on-mobile {
+            display: block;
+        }
+    }
+}

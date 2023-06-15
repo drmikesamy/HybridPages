@@ -1,0 +1,97 @@
+//responsive mixins
+
+@mixin display-on-large-mobile-upwards {
+	@media only screen and (max-width: $large-mobile-screen-size) {
+		display: none;
+	}
+}
+
+@mixin display-on-tablet-upwards {
+	@media only screen and (max-width: $tablet-screen-size) {
+		display: none;
+	}
+}
+
+@mixin display-on-desktop-upwards {
+	@media only screen and (max-width: $desktop-screen-size) {
+		display: none;
+	}
+}
+
+@mixin display-on-mobile-downwards {
+	@media only screen and (min-width: $large-mobile-screen-size) {
+		display: none;
+	}
+}
+
+@mixin display-on-large-mobile-downwards {
+	@media only screen and (min-width: $tablet-screen-size) {
+		display: none;
+	}
+}
+
+@mixin display-on-tablet-downwards {
+	@media only screen and (min-width: $desktop-screen-size) {
+		display: none;
+	}
+}
+
+@mixin display-on-desktop-downwards {
+	@media only screen and (min-width: $large-desktop-screen-size) {
+		display: none;
+	}
+}
+
+//Spacings
+
+@mixin responsive-grid-gap {
+	grid-gap: 11px;
+
+	@media only screen and (min-width: $large-mobile-screen-size) {
+		grid-gap: 14px;
+	}
+
+	@media only screen and (min-width: $tablet-screen-size) {
+		grid-gap: 18px;
+	}
+
+	@media only screen and (min-width: $desktop-screen-size) {
+		grid-gap: 22px;
+	}
+}
+
+@mixin responsive-content-padding {
+	padding: 0.5rem;
+
+	@media only screen and (min-width: $large-mobile-screen-size) {
+		padding: 1rem;
+	}
+
+	@media only screen and (min-width: $tablet-screen-size) {
+		padding: 1.2rem;
+	}
+
+	@media only screen and (min-width: $desktop-screen-size) {
+		padding: 1.4rem;
+	}
+}
+
+@mixin responsive-text-block-padding {
+	padding: 0 1.5rem;
+
+	@media only screen and (min-width: $large-mobile-screen-size) {
+		padding: 0 1.5rem;
+	}
+
+	@media only screen and (min-width: $tablet-screen-size) {
+		padding: 0 1.5rem;
+	}
+
+	@media only screen and (min-width: $desktop-screen-size) {
+		padding: 0 1.5rem;
+	}
+}
+
+.hide-on-mobile {
+	@include display-on-tablet-upwards;
+}

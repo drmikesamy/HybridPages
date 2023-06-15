@@ -1,0 +1,165 @@
+.card-row {
+    display: grid;
+    @include responsive-grid-gap;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.card {
+    overflow: hidden;
+    background-color: $white;
+    -webkit-box-shadow: $default-shadow;
+    box-shadow: $default-shadow;
+    border-radius: $default-border-radius;
+    //padding: 0.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    -webkit-transition: ease-in 0.2s;
+    -o-transition: ease-in 0.2s;
+    transition: ease-in 0.2s;
+    border: 1px solid $very-light-grey;
+    min-height: 300px;
+}
+
+.card-row.full-width-card {
+    @media only screen and (min-width: $tablet-screen-size) {
+        h3 {
+            font-size: 2rem;
+        }
+    
+        p {
+            font-size: 1.2rem;
+            line-height: 1.4rem;
+            max-height: 4.2rem;
+        }
+    }
+}
+
+.card:hover {
+    h2,
+    h3 {
+        text-decoration: underline;
+    }
+    -webkit-box-shadow: $hover-shadow;
+    box-shadow: $hover-shadow;
+    border: 1px solid $white;
+
+    .card-image {
+        -webkit-transform: scale(1.1);
+        -ms-transform: scale(1.1);
+        transform: scale(1.1);
+    }
+}
+
+.card-image-container {
+    position: relative;
+    min-height: 200px;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.card-image {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    -webkit-transition: all 0.5s;
+    -o-transition: all 0.5s;
+    transition: all 0.5s;
+}
+
+.card-content {
+    padding: 0rem 1.6rem 1.5rem 1.6rem;
+    position: relative;
+    overflow-wrap: break-word;
+    p {
+        max-height: 3.6rem;
+        overflow-y: hidden;
+    }
+}
+
+a.clickable-card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 101;
+}
+
+//Carousel
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes fade-out {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes fade-out {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+.carousel-card {
+    -webkit-animation: fade-in 1s;
+    animation: fade-in 1s;
+
+    .card-image {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: reverse;
+        -ms-flex-flow: column-reverse;
+        flex-flow: column-reverse;
+    }
+
+    .carousel-progress-container {
+        width: 100%;
+    }
+
+    .carousel-progress {
+        height: 4px;
+        width: 0px;
+        background-color: $accent-colour;
+    }
+}
+
+.carousel-card:not(:first-child) {
+    display: none;
+}
+
+//IE Hacks
+
+@media all and (-ms-high-contrast: none) {
+    .card-row {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .card {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card:not(:last-child) {
+        margin-right: 22px;
+    }
+}

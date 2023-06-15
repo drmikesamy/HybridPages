@@ -1,0 +1,93 @@
+//Base font sizing
+
+html {
+    font-size: $base-font-size;
+    color: $medium-grey;
+
+    @media only screen and (min-width: $mobile-screen-size) {
+        font-size: 1.1rem;
+    }
+
+    @media only screen and (min-width: $large-mobile-screen-size) {
+        font-size: 1.1rem;
+    }
+
+    @media only screen and (min-width: $desktop-screen-size) {
+        font-size: 1.1rem;
+    }
+
+    @media only screen and (min-width: $large-desktop-screen-size) {
+        font-size: 1.1rem;
+    }
+}
+
+//Base fonts
+
+@font-face {
+    font-family: "Open Sans";
+    src: url("wwwroot/fonts/open-sans/OpenSans-Regular.ttf");
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: font-face;
+}
+
+h1.jumbotext {
+    font-family: font-face;
+    font-size: 2rem;
+    color: white;
+    font-weight: normal;
+    text-shadow: $default-shadow;
+    margin: 0;
+    padding: 0;
+
+    @media only screen and (min-width: $large-mobile-screen-size) {
+        font-size: 2.3rem;
+    }
+
+    @media only screen and (min-width: $tablet-screen-size) {
+        font-size: 2.7rem;
+    }
+
+    @media only screen and (min-width: $desktop-screen-size) {
+        font-size: 3rem;
+    }
+}
+
+h2.layout-element {
+    padding: 0;
+    margin: 0;
+    font-weight: normal;
+}
+
+.colour-invert {
+    color: white;
+}
+
+p {
+    font-family: font-face;
+}
+
+a:link {
+    color: $primary-colour;
+    -webkit-transition: ease-in 0.2s;
+    -o-transition: ease-in 0.2s;
+    transition: ease-in 0.2s;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.info-message {
+    padding: 1rem 2rem;
+    margin: 1rem 2rem;
+    border: 1px solid white;
+    border-radius: 8px;
+    text-align: center;
+}
