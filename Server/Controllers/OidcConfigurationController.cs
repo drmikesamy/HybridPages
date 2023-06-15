@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Pages.Server.Controllers
+namespace HybridPages.Server.Controllers
 {
     public class OidcConfigurationController : Controller
     {

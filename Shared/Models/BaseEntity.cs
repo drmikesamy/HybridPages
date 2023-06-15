@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Pages.Shared.Interfaces;
+using HybridPages.Shared.Interfaces;
 
-namespace Pages.Shared.Models
+namespace HybridPages.Shared.Models
 {
     public class BaseEntity<T> : IBaseEntity
     where T : class

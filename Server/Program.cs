@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Pages.Server.Data;
-using Pages.Server.Models;
+using HybridPages.Server.Data;
+using HybridPages.Server.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 

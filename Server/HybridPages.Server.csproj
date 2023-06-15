@@ -13,8 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Client\Pages.Client.csproj" />
-    <ProjectReference Include="..\Shared\Pages.Shared.csproj" />
+    <ProjectReference Include="..\Client\HybridPages.Client.csproj" />
+    <ProjectReference Include="..\Shared\HybridPages.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

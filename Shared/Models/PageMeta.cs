@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Pages.Shared.Models
+namespace HybridPages.Shared.Models
 {
     public class PageMeta : BaseEntity<PageMeta>
     {

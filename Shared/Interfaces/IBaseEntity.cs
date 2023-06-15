@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Pages.Shared.Interfaces
+namespace HybridPages.Shared.Interfaces
 {
     public interface IBaseEntity
     {

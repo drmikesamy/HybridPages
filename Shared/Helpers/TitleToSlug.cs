@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pages.Shared.Helpers
+namespace HybridPages.Shared.Helpers
 {
     public static class TitleToSlug
     {

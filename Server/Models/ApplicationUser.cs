@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace Pages.Server.Models
+namespace HybridPages.Server.Models
 {
     public class ApplicationUser : IdentityUser
     {

@@ -3,11 +3,11 @@ using Duende.IdentityServer.Models;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Pages.Server.Models;
-using Pages.Shared.Interfaces;
-using Pages.Shared.Models;
+using HybridPages.Server.Models;
+using HybridPages.Shared.Interfaces;
+using HybridPages.Shared.Models;
 
-namespace Pages.Server.Data
+namespace HybridPages.Server.Data
 {
     public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>
     {

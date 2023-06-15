@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Pages.Server.Data;
-using Pages.Shared.Models;
+using HybridPages.Server.Data;
+using HybridPages.Shared.Models;
 using System.Security.Claims;
 
-namespace Pages.Server.Controllers
+namespace HybridPages.Server.Controllers
 {
     [Authorize]
     [ApiController]
