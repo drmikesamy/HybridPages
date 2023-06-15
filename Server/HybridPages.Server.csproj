@@ -4,7 +4,7 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>Pages.Server-6dddc473-67c7-4019-8842-590b865b0d9a</UserSecretsId>
+    <UserSecretsId>HybridPages.Server-6dddc473-67c7-4019-8842-590b865b0d9a</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,6 +28,7 @@
 
   <ItemGroup>
     <Folder Include="Data\Migrations\" />
+    <Folder Include="Migrations\" />
   </ItemGroup>
 
 </Project>

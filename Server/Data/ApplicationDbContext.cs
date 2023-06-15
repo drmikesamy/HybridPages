@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using HybridPages.Server.Models;
 using HybridPages.Shared.Interfaces;
 using HybridPages.Shared.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace HybridPages.Server.Data
 {

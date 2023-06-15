@@ -7,9 +7,9 @@ namespace HybridPages.Shared.Enums
 {
     public enum LinkTypeEnum
     {
-        Vimeo,
-        YouTube,
-        Image,
-        Url
+        Url = 0,
+        Image = 1,
+        YouTube = 2,
+        Vimeo = 3
     }
 }

@@ -7,8 +7,8 @@ namespace HybridPages.Shared.Enums
 {
     public enum PageTypeEnum
     {
-        PersonalProfile,
-        CompanyProfile,
-        Event
+        PersonalProfile = 0,
+        CompanyProfile = 1,
+        Event = 2
     }
 }
