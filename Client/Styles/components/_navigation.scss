@@ -25,6 +25,7 @@ nav.primary-nav {
         &::-webkit-scrollbar {
             display: none;
         }
+
         ul {
             display: -webkit-box;
             display: -ms-flexbox;
@@ -35,9 +36,11 @@ nav.primary-nav {
             flex-direction: row;
             list-style-type: none;
             margin: 0;
+
             @media only screen and (min-width: $tablet-screen-size) {
                 margin-left: 1rem;
             }
+
             padding: 0;
             white-space: nowrap;
 
@@ -49,7 +52,7 @@ nav.primary-nav {
                 display: block;
                 font-size: 1.1rem;
                 line-height: 1rem;
-                font-family: Roboto;
+                font-family: 'Open Sans';
                 color: white;
                 text-align: center;
                 text-decoration: none;
@@ -73,6 +76,7 @@ nav.primary-nav {
             }
         }
     }
+
     .primary-nav-right {
         -webkit-box-flex: 1;
         -ms-flex-positive: 1;
@@ -108,27 +112,32 @@ nav.primary-nav {
     display: -ms-grid;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+
     @media only screen and (min-width: $large-mobile-screen-size) {
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     }
+
     @media only screen and (min-width: $tablet-screen-size) {
         grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     }
+
     @media only screen and (min-width: $desktop-screen-size) {
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     }
 
     @include responsive-grid-gap;
+
     li {
         display: inline;
         text-align: center;
     }
-    li a {
-        font-family: Roboto-Medium;
-        color: white;
 
+    li a {
+        font-family: 'Open Sans';
+        color: white;
         text-decoration: none;
     }
+
     li:last-child {
         margin-right: 0px;
     }

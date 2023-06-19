@@ -17,7 +17,7 @@
       "autoPrefix": "",
       "loadPaths": "",
       "style": "expanded",
-      "relativeUrls": true,
+      "relativeUrls": false,
       "sourceMap": false
     },
     "nodesass": {
@@ -27,7 +27,7 @@
       "indentWidth": 2,
       "outputStyle": "nested",
       "precision": 5,
-      "relativeUrls": true,
+      "relativeUrls": false,
       "sourceMapRoot": "",
       "lineFeed": "",
       "sourceMap": false

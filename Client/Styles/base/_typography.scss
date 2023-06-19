@@ -2,18 +2,18 @@
 
 html {
     font-size: $base-font-size;
-    color: $medium-grey;
+    color: $font-colour;
 
     @media only screen and (min-width: $mobile-screen-size) {
-        font-size: 1.1rem;
+        font-size: 0.8rem;
     }
 
     @media only screen and (min-width: $large-mobile-screen-size) {
-        font-size: 1.1rem;
+        font-size: 0.9rem;
     }
 
     @media only screen and (min-width: $desktop-screen-size) {
-        font-size: 1.1rem;
+        font-size: 1rem;
     }
 
     @media only screen and (min-width: $large-desktop-screen-size) {
@@ -24,8 +24,8 @@ html {
 //Base fonts
 
 @font-face {
-    font-family: "Open Sans";
-    src: url("wwwroot/fonts/open-sans/OpenSans-Regular.ttf");
+    font-family: 'Open Sans';
+    src: url('/css/fonts/open-sans/OpenSans-Regular.ttf');
 }
 
 h1,
@@ -34,11 +34,16 @@ h3,
 h4,
 h5,
 h6 {
-    font-family: font-face;
+    font-family: 'Open Sans';
+    color: $font-colour;
+}
+
+p {
+    color: $font-colour;
 }
 
 h1.jumbotext {
-    font-family: font-face;
+    font-family: 'Open Sans';
     font-size: 2rem;
     color: white;
     font-weight: normal;
@@ -70,7 +75,7 @@ h2.layout-element {
 }
 
 p {
-    font-family: font-face;
+    font-family: 'Open Sans';
 }
 
 a:link {

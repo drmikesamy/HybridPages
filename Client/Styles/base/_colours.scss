@@ -11,6 +11,7 @@ $charcoal-grey: #222222;
 $medium-grey: #5c5c5c;
 $light-grey: #929292;
 $very-light-grey: #e0e0e0;
+$font-colour: black;
 
 //Basic colours:
 $white: #ffffff;
@@ -19,6 +20,12 @@ $background-colour: #fdfdfd;
 $dark-overlay-colour: rgba($charcoal-grey, 0.5);
 $dark-overlay-bottom-gradient: rgba($charcoal-grey, 0.5);
 
+//Styles
+$default-border-colour: transparent;
+
+//Transparent
+$white-transparent: rgba($white, 0.6);
+
 //Gradients
 
 $primary-gradient: linear-gradient(180deg, $secondary-colour -77.16%, $primary-colour 174.45%);
@@ -26,12 +33,8 @@ $warning-gradient: linear-gradient(180deg, $warning-colour 0%, #df554c 100%);
 $accent-gradient: linear-gradient(0deg, #ffc180 -0.65%, #ffdebb 100%);
 $dark-overlay-bottom-gradient: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.7) 100%);
 
-//Default border radius
-
-$default-border-radius: 4px;
-
 //Shadows
-$default-shadow: 0px 2px 8px rgba(0, 0, 0, 0.25);
+$default-shadow: 0px 2px 8px rgba(0, 0, 0, 0.15);
 $inset-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.25);
 $hover-shadow: 0px 2px 12px rgba(0, 0, 0, 0.5);
 $click-shadow: 0px 2px 0px rgba(0, 0, 0, 0.25);
