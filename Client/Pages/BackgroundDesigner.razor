@@ -1,0 +1,16 @@
+﻿@page "/backgrounddesigner"
+@using HybridPages.Shared.Models.Styling;
+
+@foreach(var radialGradient in backgroundMesh.ColourPoints)
+{
+    <div class="colour-circle"></div>
+}
+
+@code {
+    private BackgroundMesh backgroundMesh = new();
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+}

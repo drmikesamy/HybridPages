@@ -1,27 +1,63 @@
 ﻿@page "/"
+@page "/{UniqueName}"
+@using System.Text.RegularExpressions;
+@using HybridPages.Shared.Models;
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+@inject HttpClient Http
+
 <div class="card-list">
 	<PageTitle>Index</PageTitle>
-	<div class="img" style="background-image: url('images/lorelle.jpg')">
-	</div>
-	<div class="card">
-		<h1>Dr. Lorelle Brownlee</h1>
-		<p>I'm a potato doctor. Mainly nursing potatoes in this shit.</p>
-	</div>
-	<h2>Social Media</h2>
-	<div class="socials">
+	@if (page == null)
+	{
+		<div class="card">
+			<p><em>Loading...</em></p>
+		</div>
+	}
+	else
+	{
+		<div class="img" style="background-image: url('images/lorelle.jpg')">
+		</div>
+		@foreach (var post in page.Posts)
+		{
+			<div class="card">
+				<EditForm Model="@post" OnSubmit="@Save">
+					<InputText @bind-Value="post.Content" />
 
-	</div>
-	<h2>Publications</h2>
-	<div class="card">
-		<p>Albert Einstein, The Meaning of Relativity (Princeton: Princeton University Press, 1923), 44–45.</p>
-	</div>
-	<div class="card">
-		<p>Albert Einstein, The Meaning of Relativity (Princeton: Princeton University Press, 1923), 44–45.</p>
-	</div>
-	<div class="card">
-		<h1>Dr. Lorelle Brownlee</h1>
-		<p>I'm a potato doctor. Mainly nursing potatoes in this shit.</p>
-	</div>
-
+					<button type="submit">Submit</button>
+				</EditForm>
+			</div>
+		}
+	}
 </div>
 
+@code {
+	[Parameter]
+	public string UniqueName { get; set; }
+	private Page? page { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (UniqueName != null)
+		{
+			try
+			{
+				page = await Http.GetFromJsonAsync<Page>("page/" + UniqueName);
+				if (page == null)
+					page = new Page
+						{
+							UniqueName = UniqueName,
+							Posts = new List<Post> { new Post() }
+						};
+			}
+			catch (AccessTokenNotAvailableException exception)
+			{
+				exception.Redirect();
+			}
+		}
+	}
+
+	public async Task Save()
+	{
+		var response = await Http.PostAsJsonAsync("page", page, CancellationToken.None);
+	}
+}

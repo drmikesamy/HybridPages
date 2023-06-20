@@ -18,7 +18,7 @@ namespace HybridPages.Server.Data
         {
         }
         public DbSet<UserProfile> UserProfiles { get; set; }
-        public DbSet<Link> Links { get; set; }
+        public DbSet<Post> Posts { get; set; }
         public DbSet<Page> Pages { get; set; }
         public DbSet<PageMeta> PageMeta { get; set; }
         public DbSet<UserMeta> UserMeta { get; set; }
@@ -26,8 +26,8 @@ namespace HybridPages.Server.Data
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<UserProfile>().ToTable("UserProfiles");
-            modelBuilder.Entity<Link>().ToTable("Links");
-            modelBuilder.Entity<Page>().ToTable("Pages");
+            modelBuilder.Entity<Post>().ToTable("Links");
+            modelBuilder.Entity<Page>().ToTable("Posts");
             modelBuilder.Entity<PageMeta>().ToTable("PageMeta");
             modelBuilder.Entity<UserMeta>().ToTable("UserMeta");
         }

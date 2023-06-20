@@ -17,8 +17,7 @@ namespace HybridPages.Shared.Models
         public long CreatorId { get; set; }
         public virtual UserProfile Creator { get; set; }
         public string FeaturedImageUrl { get; set; }
-        [InverseProperty("Pages")]
-        public virtual ICollection<Link> Links { get; set; }
+        public virtual ICollection<Post> Posts { get; set; }
         public virtual ICollection<PageMeta> PageMeta { get; set; }
     }
 }
