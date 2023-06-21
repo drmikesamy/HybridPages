@@ -141,8 +141,6 @@ html {
 body {
   margin: 0;
   padding: 0;
-  background-color: hsl(237deg, 100%, 50%);
-  background-image: radial-gradient(at 55% 68%, hsl(228deg, 40%, 83%) 0px, transparent 50%), radial-gradient(at 38% 31%, hsla(191deg, 100%, 50%, 0.84) 0px, transparent 50%), radial-gradient(at 24% 60%, hsl(310deg, 95%, 60%) 0px, transparent 50%), radial-gradient(at 67% 41%, hsl(304deg, 95%, 62%) 0px, transparent 50%), radial-gradient(at 0% 100%, hsl(254deg, 0%, 73%) 0px, transparent 50%), radial-gradient(at 80% 100%, hsl(201deg, 57%, 76%) 0px, transparent 50%), radial-gradient(at 15% 20%, hsl(258deg, 100%, 11%) 0px, transparent 50%);
   background-size: 100vw 100vh;
   background-repeat: no-repeat;
   background-attachment: fixed;

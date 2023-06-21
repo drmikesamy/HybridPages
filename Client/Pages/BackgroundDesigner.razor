@@ -1,16 +1,51 @@
 ﻿@page "/backgrounddesigner"
 @using HybridPages.Shared.Models.Styling;
 
-@foreach(var radialGradient in backgroundMesh.ColourPoints)
-{
-    <div class="colour-circle"></div>
-}
+<div class="background-colour" style="position:absolute; left:0px; right:0px; top:0px; bottom:0px; @backgroundCss" @onpointerdown="UpdatePointer">
+@xpos
+@ypos
+</div>
 
 @code {
-    private BackgroundMesh backgroundMesh = new();
+	private BackgroundMesh backgroundMesh = new();
+	private string backgroundCss = "test";
+	private double xpos = 0;
+	private double ypos = 0;
 
-    private void IncrementCount()
-    {
-        currentCount++;
-    }
+	protected override async Task OnInitializedAsync()
+	{
+		backgroundMesh = new BackgroundMesh
+		{
+			BackgroundColour = new RadialGradient { HPosPercent = 0, VPosPercent = 0, H = 237, S = 100, L = 50, A = 1, Alpha = 100 },
+			ColourPoints = new List<RadialGradient>
+			{
+				new RadialGradient {HPosPercent = 55, VPosPercent = 68, H = 228, S = 40, L = 83, A = 1, Alpha = 50},
+				new RadialGradient {HPosPercent = 38, VPosPercent = 31, H = 200, S = 100, L = 50, A = 0.84f, Alpha = 50},
+				new RadialGradient {HPosPercent = 24, VPosPercent = 60, H = 310, S = 95, L = 60, A = 1, Alpha = 50},
+				new RadialGradient {HPosPercent = 67, VPosPercent = 41, H = 100, S = 95, L = 62, A = 1, Alpha = 50},
+				new RadialGradient {HPosPercent = 0, VPosPercent = 100, H = 100, S = 0, L = 73, A = 1, Alpha = 50},
+				new RadialGradient {HPosPercent = 80, VPosPercent = 100, H = 201, S = 57, L = 76, A = 1, Alpha = 50},
+				new RadialGradient {HPosPercent = 15, VPosPercent = 20, H = 258, S = 100, L = 11, A = 1, Alpha = 50}
+			}
+		};
+		RenderBackground();
+	}
+	public void RenderBackground()
+	{
+		backgroundCss = $"background-color: hsla({backgroundMesh.BackgroundColour.H}, {backgroundMesh.BackgroundColour.S}%, {backgroundMesh.BackgroundColour.L}%, {backgroundMesh.BackgroundColour.A});";
+		backgroundCss += $"background-image: ";
+
+		foreach(var colourPoint in backgroundMesh.ColourPoints)
+		{
+			backgroundCss += $"radial-gradient(at {colourPoint.HPosPercent}% {colourPoint.HPosPercent}%, hsla({colourPoint.H}, {colourPoint.S}%, {colourPoint.L}%, {colourPoint.A}) 0px, transparent {colourPoint.Alpha}%),";
+		}
+		backgroundCss = backgroundCss.Remove(backgroundCss.Length - 1, 1) + ";";
+		StateHasChanged();
+	}
+	public void UpdatePointer(PointerEventArgs args)
+	{
+		xpos = args.OffsetX;
+		ypos = args.OffsetY;
+		StateHasChanged();
+	}
 }

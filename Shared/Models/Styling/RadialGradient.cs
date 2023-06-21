@@ -13,7 +13,7 @@ namespace HybridPages.Shared.Models.Styling
 		public int H { get; set; }
 		public int S { get; set; }
 		public int L { get; set; }
-		public int A { get; set; }
+		public float A { get; set; }
 		public int Alpha { get; set; }
 	}
 }
