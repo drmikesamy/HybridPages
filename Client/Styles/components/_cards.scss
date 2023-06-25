@@ -12,3 +12,23 @@
     border-radius: 70px;
     justify-self: center;
 }
+
+//background designer
+
+.background-designer {
+    position: fixed;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+}
+
+.draggable-circle {
+    width: 20px;
+    height: 20px;
+    box-shadow: $dark-shadow;
+    background-color: white;
+    border-radius: 12px;
+    position: absolute;
+    z-index: 9;
+}

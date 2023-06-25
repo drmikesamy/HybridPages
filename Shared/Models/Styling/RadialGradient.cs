@@ -10,6 +10,8 @@ namespace HybridPages.Shared.Models.Styling
 	{
 		public int HPosPercent { get; set; }
 		public int VPosPercent { get; set; }
+		public int HPosAbs { get; set; }
+		public int VPosAbs { get; set; }
 		public int H { get; set; }
 		public int S { get; set; }
 		public int L { get; set; }

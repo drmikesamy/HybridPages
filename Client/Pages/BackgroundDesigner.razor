@@ -1,23 +1,32 @@
 ﻿@page "/backgrounddesigner"
+@using HybridPages.Shared.Helpers;
 @using HybridPages.Shared.Models.Styling;
+@inject DOMElements DOMElements;
 
-<div class="background-colour" style="position:absolute; left:0px; right:0px; top:0px; bottom:0px; @backgroundCss" @onpointerdown="UpdatePointer">
-@xpos
-@ypos
+<div class="background-designer" style="@backgroundCss" @onmousemove="(args) => MouseMove(args)" @onmouseup="(args) => MouseUp(args)">
+	@backgroundCss
+	@foreach (var colourPoint in backgroundMesh.ColourPoints)
+	{
+		<div @onmousedown="(args) => MouseDown(colourPoint, args)" @onmouseup="(args) => MouseUp(args)" class=" draggable-circle" style="background-color: hsl(@colourPoint.H, @colourPoint.S%, @colourPoint.L%, @colourPoint.A%); left: @(colourPoint.HPosAbs-10)px; top: @(colourPoint.VPosAbs-10)px">
+		
+		</div>
+	}
 </div>
 
 @code {
 	private BackgroundMesh backgroundMesh = new();
+	private WindowDimensions windowDimensions = new WindowDimensions { Height = 0, Width = 0 };
 	private string backgroundCss = "test";
-	private double xpos = 0;
-	private double ypos = 0;
+	private double mousex = 0;
+	private double mousey = 0;
+	private RadialGradient? _colourPoint;
 
 	protected override async Task OnInitializedAsync()
 	{
 		backgroundMesh = new BackgroundMesh
-		{
-			BackgroundColour = new RadialGradient { HPosPercent = 0, VPosPercent = 0, H = 237, S = 100, L = 50, A = 1, Alpha = 100 },
-			ColourPoints = new List<RadialGradient>
+			{
+				BackgroundColour = new RadialGradient { HPosPercent = 0, VPosPercent = 0, H = 237, S = 100, L = 50, A = 1, Alpha = 100 },
+				ColourPoints = new List<RadialGradient>
 			{
 				new RadialGradient {HPosPercent = 55, VPosPercent = 68, H = 228, S = 40, L = 83, A = 1, Alpha = 50},
 				new RadialGradient {HPosPercent = 38, VPosPercent = 31, H = 200, S = 100, L = 50, A = 0.84f, Alpha = 50},
@@ -27,26 +36,75 @@
 				new RadialGradient {HPosPercent = 80, VPosPercent = 100, H = 201, S = 57, L = 76, A = 1, Alpha = 50},
 				new RadialGradient {HPosPercent = 15, VPosPercent = 20, H = 258, S = 100, L = 11, A = 1, Alpha = 50}
 			}
-		};
+			};
 		RenderBackground();
+		UpdateColourPoints();
 	}
 	public void RenderBackground()
 	{
 		backgroundCss = $"background-color: hsla({backgroundMesh.BackgroundColour.H}, {backgroundMesh.BackgroundColour.S}%, {backgroundMesh.BackgroundColour.L}%, {backgroundMesh.BackgroundColour.A});";
 		backgroundCss += $"background-image: ";
 
-		foreach(var colourPoint in backgroundMesh.ColourPoints)
+		foreach (var colourPoint in backgroundMesh.ColourPoints)
 		{
-			backgroundCss += $"radial-gradient(at {colourPoint.HPosPercent}% {colourPoint.HPosPercent}%, hsla({colourPoint.H}, {colourPoint.S}%, {colourPoint.L}%, {colourPoint.A}) 0px, transparent {colourPoint.Alpha}%),";
+			backgroundCss += $"radial-gradient(at {colourPoint.HPosPercent}% {colourPoint.VPosPercent}%, hsla({colourPoint.H}, {colourPoint.S}%, {colourPoint.L}%, {colourPoint.A}) 0px, transparent {colourPoint.Alpha}%),";
 		}
 		backgroundCss = backgroundCss.Remove(backgroundCss.Length - 1, 1) + ";";
 		StateHasChanged();
 	}
-	public void UpdatePointer(PointerEventArgs args)
+
+	//public void UpdatePointerPos(PointerEventArgs args)
+	//{
+	//	mousex = Math.Round(args.OffsetX / windowDimensions.Width * 100);
+	//	mousey = Math.Round(args.OffsetY / windowDimensions.Height * 100);
+	//	StateHasChanged();
+	//}
+
+	public void MouseDown(RadialGradient colourPoint, MouseEventArgs args)
 	{
-		args.
-		xpos = args.OffsetX;
-		ypos = args.OffsetY;
+		_colourPoint = colourPoint;
+	}
+
+	public async void MouseMove(MouseEventArgs args)
+	{
+		if (_colourPoint != null)
+		{
+			_colourPoint.HPosAbs = Convert.ToInt32(Math.Round(_colourPoint.HPosAbs + args.MovementX));
+			_colourPoint.VPosAbs = Convert.ToInt32(Math.Round(_colourPoint.VPosAbs + args.MovementY));
+
+			windowDimensions = await DOMElements.GetWindowDimensions();
+
+			_colourPoint.HPosPercent = Convert.ToInt32(Math.Round(_colourPoint.HPosAbs / (double)windowDimensions.Width * 100));
+			_colourPoint.VPosPercent = Convert.ToInt32(Math.Round(_colourPoint.VPosAbs / (double)windowDimensions.Height * 100));
+
+			
+			StateHasChanged();
+			RenderBackground();
+		}
+	}
+
+	public void MouseUp(MouseEventArgs args)
+	{
+		_colourPoint = null;
+	}
+	
+	//public void StopDrag()
+	//{
+		
+	//}
+
+	public async void UpdateColourPoints()
+	{
+		windowDimensions = await DOMElements.GetWindowDimensions();
+
+		foreach (var colourPoint in backgroundMesh.ColourPoints)
+		{
+			colourPoint.HPosAbs = Convert.ToInt32(Math.Round((double)colourPoint.HPosPercent / 100 * windowDimensions.Width, 0));
+			colourPoint.VPosAbs = Convert.ToInt32(Math.Round((double)colourPoint.VPosPercent / 100 * windowDimensions.Height, 0));
+		}
+
 		StateHasChanged();
 	}
+
+
 }

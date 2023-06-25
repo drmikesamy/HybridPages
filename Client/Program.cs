@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using HybridPages.Client;
+using HybridPages.Shared.Helpers;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -14,5 +15,7 @@ builder.Services.AddHttpClient("HybridPages.ServerAPI", client => client.BaseAdd
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("HybridPages.ServerAPI"));
 
 builder.Services.AddApiAuthorization();
+
+builder.Services.AddScoped<DOMElements>();
 
 await builder.Build().RunAsync();

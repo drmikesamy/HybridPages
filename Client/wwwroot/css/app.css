@@ -300,6 +300,24 @@ body {
   justify-self: center;
 }
 
+.background-designer {
+  position: fixed;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+}
+
+.draggable-circle {
+  width: 20px;
+  height: 20px;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.55);
+  background-color: white;
+  border-radius: 12px;
+  position: absolute;
+  z-index: 9;
+}
+
 button,
 input[type=submit].button,
 .button-text {
