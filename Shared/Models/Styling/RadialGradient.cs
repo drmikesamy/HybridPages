@@ -17,5 +17,6 @@ namespace HybridPages.Shared.Models.Styling
 		public int L { get; set; }
 		public float A { get; set; }
 		public int Alpha { get; set; }
+		public int LayerHeight { get; set; }
 	}
 }

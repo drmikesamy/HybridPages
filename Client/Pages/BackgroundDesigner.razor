@@ -3,12 +3,79 @@
 @using HybridPages.Shared.Models.Styling;
 @inject DOMElements DOMElements;
 
-<div class="background-designer" style="@backgroundCss" @onmousemove="(args) => MouseMove(args)" @onmouseup="(args) => MouseUp(args)">
-	@backgroundCss
+<div class="background-designer" style="@backgroundCss" @onmousemove="(args) => MouseMove(args)" @onmouseup="(args) => MouseUp(args)" @onmousedown="MouseDown">
+
+	<div class="fixed-debug">
+		@backgroundCss
+	</div>
+
 	@foreach (var colourPoint in backgroundMesh.ColourPoints)
 	{
-		<div @onmousedown="(args) => MouseDown(colourPoint, args)" @onmouseup="(args) => MouseUp(args)" class=" draggable-circle" style="background-color: hsl(@colourPoint.H, @colourPoint.S%, @colourPoint.L%, @colourPoint.A%); left: @(colourPoint.HPosAbs-10)px; top: @(colourPoint.VPosAbs-10)px">
-		
+		<div @onmousedown="() => SelectColourPoint(colourPoint)" @onmousedown:preventDefault="true" class=" draggable-circle" style="background-color: hsl(@colourPoint.H, @colourPoint.S%, @colourPoint.L%, @colourPoint.A%); left: @(colourPoint.HPosAbs-10)px; top: @(colourPoint.VPosAbs-10)px">
+		@colourPoint.LayerHeight
+		</div>
+	}
+	@if (_colourPoint != null)
+	{
+		<div class="colour-settings" @onmousedown="() => ColourSettingsActive(true)" @onmouseup="() => ColourSettingsActive(false)">
+			<div class="slider-row">
+				<div class="slider-label">
+					H
+				</div>
+				<div class="slider-component">
+					<input type="range" id="h" name="h" min="0" max="360" @bind-value="_colourPoint.H" @bind-value:event="oninput">
+				</div>
+				<div class="slider-value">
+					@_colourPoint.H
+				</div>
+			</div>
+			<div class="slider-row">
+				<div class="slider-label">
+					S
+				</div>
+				<div class="slider-component">
+					<input type="range" id="s" name="s" min="0" max="100" @bind-value="_colourPoint.S" @bind-value:event="oninput">
+				</div>
+				<div class="slider-value">
+					@_colourPoint.S
+				</div>
+			</div>
+			<div class="slider-row">
+				<div class="slider-label">
+					L
+				</div>
+				<div class="slider-component">
+					<input type="range" id="l" name="l" min="0" max="100" @bind-value="_colourPoint.L" @bind-value:event="oninput">
+				</div>
+				<div class="slider-value">
+					@_colourPoint.L
+				</div>
+			</div>
+			<div class="slider-row">
+				<div class="slider-label">
+					A
+				</div>
+				<div class="slider-component">
+					<input type="range" id="a" name="a" min="0" max="1" @bind-value="_colourPoint.A" step="0.01" @bind-value:event="oninput">
+				</div>
+				<div class="slider-value">
+					@_colourPoint.A
+				</div>
+			</div>
+			<div class="layer-row">
+				Layer depth
+			</div>
+			<div class="slider-row">
+				<div class="slider-label">
+
+				</div>
+				<div class="slider-component">
+					<input type="range" id="layerHeight" name="layerHeight" min="1" max="7" @bind-value="_colourPoint.LayerHeight" @oninput="UpdateLayerHeight" step="1">
+				</div>
+				<div class="slider-value">
+					@_colourPoint.LayerHeight
+				</div>
+			</div>
 		</div>
 	}
 </div>
@@ -20,6 +87,8 @@
 	private double mousex = 0;
 	private double mousey = 0;
 	private RadialGradient? _colourPoint;
+	private bool _dragging = false;
+	private bool _colourSettingsActive = false;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -28,46 +97,78 @@
 				BackgroundColour = new RadialGradient { HPosPercent = 0, VPosPercent = 0, H = 237, S = 100, L = 50, A = 1, Alpha = 100 },
 				ColourPoints = new List<RadialGradient>
 			{
-				new RadialGradient {HPosPercent = 55, VPosPercent = 68, H = 228, S = 40, L = 83, A = 1, Alpha = 50},
-				new RadialGradient {HPosPercent = 38, VPosPercent = 31, H = 200, S = 100, L = 50, A = 0.84f, Alpha = 50},
-				new RadialGradient {HPosPercent = 24, VPosPercent = 60, H = 310, S = 95, L = 60, A = 1, Alpha = 50},
-				new RadialGradient {HPosPercent = 67, VPosPercent = 41, H = 100, S = 95, L = 62, A = 1, Alpha = 50},
-				new RadialGradient {HPosPercent = 0, VPosPercent = 100, H = 100, S = 0, L = 73, A = 1, Alpha = 50},
-				new RadialGradient {HPosPercent = 80, VPosPercent = 100, H = 201, S = 57, L = 76, A = 1, Alpha = 50},
-				new RadialGradient {HPosPercent = 15, VPosPercent = 20, H = 258, S = 100, L = 11, A = 1, Alpha = 50}
+				new RadialGradient {HPosPercent = 55, VPosPercent = 68, H = 228, S = 40, L = 83, A = 1, Alpha = 50, LayerHeight = 1},
+				new RadialGradient {HPosPercent = 38, VPosPercent = 31, H = 200, S = 100, L = 50, A = 0.84f, Alpha = 50, LayerHeight = 2},
+				new RadialGradient {HPosPercent = 24, VPosPercent = 60, H = 310, S = 95, L = 60, A = 1, Alpha = 50, LayerHeight = 3},
+				new RadialGradient {HPosPercent = 67, VPosPercent = 41, H = 100, S = 95, L = 62, A = 1, Alpha = 50, LayerHeight = 4},
+				new RadialGradient {HPosPercent = 0, VPosPercent = 100, H = 100, S = 0, L = 73, A = 1, Alpha = 50, LayerHeight = 5},
+				new RadialGradient {HPosPercent = 80, VPosPercent = 100, H = 201, S = 57, L = 76, A = 1, Alpha = 50, LayerHeight = 6},
+				new RadialGradient {HPosPercent = 15, VPosPercent = 20, H = 258, S = 100, L = 11, A = 1, Alpha = 50, LayerHeight = 7}
 			}
 			};
 		RenderBackground();
 		UpdateColourPoints();
+
+		var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+
+		while (await timer.WaitForNextTickAsync())
+		{
+			windowDimensions = await DOMElements.GetWindowDimensions();
+		}
 	}
+
+	public void UpdateLayerHeight()
+	{
+		var newOrderCount = 1;
+
+		backgroundMesh.ColourPoints = backgroundMesh.ColourPoints.OrderBy(l => l.LayerHeight).ToList();
+
+		foreach (var colourPoint in backgroundMesh.ColourPoints)
+		{
+			if ((colourPoint == _colourPoint || newOrderCount == _colourPoint.LayerHeight) && colourPoint.LayerHeight != newOrderCount)
+				continue;
+
+			colourPoint.LayerHeight = newOrderCount;
+			newOrderCount++;
+		}
+
+		RenderBackground();
+	}
+
 	public void RenderBackground()
 	{
-		backgroundCss = $"background-color: hsla({backgroundMesh.BackgroundColour.H}, {backgroundMesh.BackgroundColour.S}%, {backgroundMesh.BackgroundColour.L}%, {backgroundMesh.BackgroundColour.A});";
+		backgroundCss = $"background-color: {GetHSLACss(backgroundMesh.BackgroundColour)};";
 		backgroundCss += $"background-image: ";
 
 		foreach (var colourPoint in backgroundMesh.ColourPoints)
 		{
-			backgroundCss += $"radial-gradient(at {colourPoint.HPosPercent}% {colourPoint.VPosPercent}%, hsla({colourPoint.H}, {colourPoint.S}%, {colourPoint.L}%, {colourPoint.A}) 0px, transparent {colourPoint.Alpha}%),";
+			backgroundCss += $"radial-gradient(at {colourPoint.HPosPercent}% {colourPoint.VPosPercent}%, {GetHSLACss(colourPoint)} 0px, transparent {colourPoint.Alpha}%),";
 		}
 		backgroundCss = backgroundCss.Remove(backgroundCss.Length - 1, 1) + ";";
 		StateHasChanged();
 	}
 
-	//public void UpdatePointerPos(PointerEventArgs args)
-	//{
-	//	mousex = Math.Round(args.OffsetX / windowDimensions.Width * 100);
-	//	mousey = Math.Round(args.OffsetY / windowDimensions.Height * 100);
-	//	StateHasChanged();
-	//}
+	public string GetHSLACss(RadialGradient sourceColourPoint)
+	{
+		return $"hsla({sourceColourPoint.H}, {sourceColourPoint.S}%, {sourceColourPoint.L}%, {sourceColourPoint.A})";
+	}
 
-	public void MouseDown(RadialGradient colourPoint, MouseEventArgs args)
+	public void SelectColourPoint(RadialGradient colourPoint)
 	{
 		_colourPoint = colourPoint;
+	}
+	public void MouseDown()
+	{
+		if (!_colourSettingsActive)
+		{
+			_dragging = true;
+		}
+
 	}
 
 	public async void MouseMove(MouseEventArgs args)
 	{
-		if (_colourPoint != null)
+		if (_dragging && _colourPoint != null)
 		{
 			_colourPoint.HPosAbs = Convert.ToInt32(Math.Round(_colourPoint.HPosAbs + args.MovementX));
 			_colourPoint.VPosAbs = Convert.ToInt32(Math.Round(_colourPoint.VPosAbs + args.MovementY));
@@ -76,22 +177,20 @@
 
 			_colourPoint.HPosPercent = Convert.ToInt32(Math.Round(_colourPoint.HPosAbs / (double)windowDimensions.Width * 100));
 			_colourPoint.VPosPercent = Convert.ToInt32(Math.Round(_colourPoint.VPosAbs / (double)windowDimensions.Height * 100));
-
-			
-			StateHasChanged();
-			RenderBackground();
 		}
+		StateHasChanged();
+		RenderBackground();
 	}
 
 	public void MouseUp(MouseEventArgs args)
 	{
-		_colourPoint = null;
+		_dragging = false;
 	}
-	
-	//public void StopDrag()
-	//{
-		
-	//}
+
+	public void ColourSettingsActive(bool active)
+	{
+		_colourSettingsActive = active;
+	}
 
 	public async void UpdateColourPoints()
 	{

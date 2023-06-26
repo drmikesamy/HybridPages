@@ -32,3 +32,21 @@
     position: absolute;
     z-index: 9;
 }
+
+.colour-settings {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    width: 200px;
+
+    .slider-row {
+        display: grid;
+        grid-template-columns: 20px auto 20px;
+    }
+}
+
+.fixed-debug{
+    position: fixed;
+    left:10px;
+    top: 10px;
+}
