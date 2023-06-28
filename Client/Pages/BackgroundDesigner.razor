@@ -6,13 +6,11 @@
 <div class="background-designer" style="@backgroundCss" @onmousemove="(args) => MouseMove(args)" @onmouseup="(args) => MouseUp(args)" @onmousedown="MouseDown">
 
 	<div class="fixed-debug">
-		@backgroundCss
 	</div>
 
 	@foreach (var colourPoint in backgroundMesh.ColourPoints)
 	{
-		<div @onmousedown="() => SelectColourPoint(colourPoint)" @onmousedown:preventDefault="true" class=" draggable-circle" style="background-color: hsl(@colourPoint.H, @colourPoint.S%, @colourPoint.L%, @colourPoint.A%); left: @(colourPoint.HPosAbs-10)px; top: @(colourPoint.VPosAbs-10)px">
-		@colourPoint.LayerHeight
+		<div @onmousedown="() => SelectColourPoint(colourPoint)" @onmousedown:preventDefault="true" class="draggable-circle @(colourPoint == _colourPoint ? "draggable-circle-highlighted" : "")" style="background-color: hsl(@colourPoint.H, @colourPoint.S%, @colourPoint.L%, @colourPoint.A%); left: @(colourPoint.HPosAbs-10)px; top: @(colourPoint.VPosAbs-10)px">
 		</div>
 	}
 	@if (_colourPoint != null)
@@ -23,7 +21,7 @@
 					H
 				</div>
 				<div class="slider-component">
-					<input type="range" id="h" name="h" min="0" max="360" @bind-value="_colourPoint.H" @bind-value:event="oninput">
+					<input type="range" id="h" class="slider-hue" name="h" min="0" max="360" @bind-value="_colourPoint.H" @bind-value:event="oninput">
 				</div>
 				<div class="slider-value">
 					@_colourPoint.H
@@ -34,7 +32,7 @@
 					S
 				</div>
 				<div class="slider-component">
-					<input type="range" id="s" name="s" min="0" max="100" @bind-value="_colourPoint.S" @bind-value:event="oninput">
+					<input type="range" id="s" name="s" class="slider-saturation" style="background: linear-gradient(to right, hsla(@(_colourPoint.H), 0%, 50%, 1), hsla(@(_colourPoint.H), 100%, 50%, 1))" min="0" max="100" @bind-value="_colourPoint.S" @bind-value:event="oninput">
 				</div>
 				<div class="slider-value">
 					@_colourPoint.S
@@ -45,7 +43,7 @@
 					L
 				</div>
 				<div class="slider-component">
-					<input type="range" id="l" name="l" min="0" max="100" @bind-value="_colourPoint.L" @bind-value:event="oninput">
+					<input type="range" id="l" class="slider-lightness" style="background: linear-gradient(to right, hsla(@(_colourPoint.H), 100%, 0%, 1), hsla(@(_colourPoint.H), 100%, 50%, 1), hsla(@(_colourPoint.H), 100%, 100%, 1))" name="l" min="0" max="100" @bind-value="_colourPoint.L" @bind-value:event="oninput">
 				</div>
 				<div class="slider-value">
 					@_colourPoint.L
@@ -63,17 +61,17 @@
 				</div>
 			</div>
 			<div class="layer-row">
-				Layer depth
+				Foreground / Background:
 			</div>
 			<div class="slider-row">
 				<div class="slider-label">
-
+					
 				</div>
 				<div class="slider-component">
-					<input type="range" id="layerHeight" name="layerHeight" min="1" max="7" @bind-value="_colourPoint.LayerHeight" @oninput="UpdateLayerHeight" step="1">
+					<input type="range" id="layerHeight" name="layerHeight" min="1" max="7" @bind-value="_colourPoint.LayerHeight" @bind-value:event="oninput" step="0.0001">
 				</div>
 				<div class="slider-value">
-					@_colourPoint.LayerHeight
+					
 				</div>
 			</div>
 		</div>
@@ -117,30 +115,12 @@
 		}
 	}
 
-	public void UpdateLayerHeight()
-	{
-		var newOrderCount = 1;
-
-		backgroundMesh.ColourPoints = backgroundMesh.ColourPoints.OrderBy(l => l.LayerHeight).ToList();
-
-		foreach (var colourPoint in backgroundMesh.ColourPoints)
-		{
-			if ((colourPoint == _colourPoint || newOrderCount == _colourPoint.LayerHeight) && colourPoint.LayerHeight != newOrderCount)
-				continue;
-
-			colourPoint.LayerHeight = newOrderCount;
-			newOrderCount++;
-		}
-
-		RenderBackground();
-	}
-
 	public void RenderBackground()
 	{
 		backgroundCss = $"background-color: {GetHSLACss(backgroundMesh.BackgroundColour)};";
 		backgroundCss += $"background-image: ";
 
-		foreach (var colourPoint in backgroundMesh.ColourPoints)
+		foreach (var colourPoint in backgroundMesh.ColourPoints.OrderBy(c => c.LayerHeight))
 		{
 			backgroundCss += $"radial-gradient(at {colourPoint.HPosPercent}% {colourPoint.VPosPercent}%, {GetHSLACss(colourPoint)} 0px, transparent {colourPoint.Alpha}%),";
 		}

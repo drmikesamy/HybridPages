@@ -311,22 +311,43 @@ body {
 .draggable-circle {
   width: 20px;
   height: 20px;
-  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.55);
-  background-color: white;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.75);
+  background-color: rgba(255, 255, 255, 0.6);
   border-radius: 12px;
   position: absolute;
   z-index: 9;
+}
+
+.draggable-circle-highlighted {
+  border: 2px solid white;
 }
 
 .colour-settings {
   position: fixed;
   right: 20px;
   bottom: 20px;
-  width: 200px;
+  width: 280px;
 }
-.colour-settings .slider-row {
+
+.slider-row {
   display: grid;
   grid-template-columns: 20px auto 20px;
+}
+
+.slider-hue {
+  appearance: none;
+  background-color: rgba(0, 0, 0, 0.1);
+  background: linear-gradient(to right, rgb(255, 0, 0), rgb(255, 255, 0), rgb(0, 255, 0), rgb(0, 255, 255), rgb(0, 0, 255), rgb(255, 0, 255), rgb(255, 0, 0));
+}
+
+.slider-saturation {
+  appearance: none;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.slider-lightness {
+  appearance: none;
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .fixed-debug {
