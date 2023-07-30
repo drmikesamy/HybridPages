@@ -1,0 +1,11 @@
+﻿@using HybridPages.Shared.Models;
+
+<article class="jumbo-banner">
+	<h1>@post.Title</h1>
+	<h5>@post.Content</h5>
+</article>
+
+@code {
+	[Parameter]
+	public Post post { get; set; } = new Post { Title = "Your title here", Content = "This is your tagline" };
+}

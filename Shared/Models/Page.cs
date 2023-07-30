@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HybridPages.Shared.Enums;
 using HybridPages.Shared.Helpers;
+using HybridPages.Shared.Models.Styling;
 
 namespace HybridPages.Shared.Models
 {
@@ -14,11 +15,16 @@ namespace HybridPages.Shared.Models
         public PageTypeEnum Type { get; set; }
         public string Title { get; set; }
         public string UniqueName { get; set; }
-        public long CreatorId { get; set; }
-        public virtual UserProfile Creator { get; set; }
         public string FeaturedImageUrl { get; set; }
-        public virtual ICollection<Post> Posts { get; set; }
+        public long UserProfileId { get; set; }
+        public virtual LinkedList<Post> Posts { get; set; }
         public virtual ICollection<PageMeta> PageMeta { get; set; }
-    }
+        public Style? Style { get; set; }
+		public Page()
+		{
+			Posts = new LinkedList<Post>();
+			PageMeta = new HashSet<PageMeta>();
+		}
+	}
 }
 

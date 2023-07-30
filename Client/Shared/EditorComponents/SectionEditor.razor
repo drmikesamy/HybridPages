@@ -1,0 +1,48 @@
+﻿@using HybridPages.Shared.Enums;
+@using HybridPages.Shared.Interfaces;
+@using HybridPages.Shared.Models;
+@using HybridPages.Shared.Helpers;
+<section>
+	<article>
+		<input type="text" @bind="Post.Title" />
+		<input type="text" @bind="Post.Content" />
+		<button @onclick="UpdateContent">Update Content</button>
+		@if (Post?.Id != AllPosts?.First?.Value.Id)
+		{
+			<button @onclick="MoveUp">Move Up</button>
+		}
+		@if(Post?.Id != AllPosts?.Last?.Value.Id)
+		{
+			<button @onclick="MoveDown">Move Down</button>
+		}
+		
+	</article>
+</section>
+
+@code {
+	[Parameter]
+	public LinkedList<Post> AllPosts { get; set; }
+
+	[Parameter]
+	public Post Post { get; set; }
+
+	[Parameter]
+	public EventCallback PostChanged { get; set; }
+
+	public async void MoveUp()
+	{
+		AllPosts.MoveUp(Post);
+		await UpdateContent();
+	}
+
+	public async void MoveDown()
+	{
+		AllPosts.MoveDown(Post);
+		await UpdateContent();
+	}
+
+	async Task UpdateContent()
+	{
+		await PostChanged.InvokeAsync();
+	}
+}

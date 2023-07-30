@@ -1,6 +1,6 @@
-﻿@page "/backgrounddesigner"
-@using HybridPages.Shared.Helpers;
+﻿@using HybridPages.Shared.Helpers;
 @using HybridPages.Shared.Models.Styling;
+@using HybridPages.Shared.Models;
 @inject DOMElements DOMElements;
 
 <div class="background-designer" style="@backgroundCss" @onmousemove="(args) => MouseMove(args)" @onmouseup="(args) => MouseUp(args)" @onmousedown="MouseDown">
@@ -8,7 +8,9 @@
 	<div class="fixed-debug">
 	</div>
 
-	@foreach (var colourPoint in backgroundMesh.ColourPoints)
+	<button @onclick="() => SelectColourPoint(backgroundMesh.ColourPoints.Where(cp => cp.IsBackground).First())" class="fixed-button-bottom-right @(backgroundMesh.ColourPoints.Where(cp => cp.IsBackground).First() == _colourPoint ? "draggable-circle-highlighted" : "")">Edit BG</button>
+
+	@foreach (var colourPoint in backgroundMesh.ColourPoints.Where(cp => cp.IsBackground == false))
 	{
 		<div @onmousedown="() => SelectColourPoint(colourPoint)" @onmousedown:preventDefault="true" class="draggable-circle @(colourPoint == _colourPoint ? "draggable-circle-highlighted" : "")" style="background-color: hsl(@colourPoint.H, @colourPoint.S%, @colourPoint.L%, @colourPoint.A%); left: @(colourPoint.HPosAbs-10)px; top: @(colourPoint.VPosAbs-10)px">
 		</div>
@@ -65,45 +67,39 @@
 			</div>
 			<div class="slider-row">
 				<div class="slider-label">
-					
 				</div>
 				<div class="slider-component">
 					<input type="range" id="layerHeight" name="layerHeight" min="1" max="7" @bind-value="_colourPoint.LayerHeight" @bind-value:event="oninput" step="0.0001">
 				</div>
 				<div class="slider-value">
-					
 				</div>
+			</div>
+			<div class="slider-row">
+				<button @onclick="Save">Save</button>
 			</div>
 		</div>
 	}
 </div>
 
 @code {
-	private BackgroundMesh backgroundMesh = new();
 	private WindowDimensions windowDimensions = new WindowDimensions { Height = 0, Width = 0 };
-	private string backgroundCss = "test";
-	private double mousex = 0;
-	private double mousey = 0;
-	private RadialGradient? _colourPoint;
+	private string backgroundCss = "";
+	private ColourPoint? _colourPoint;
 	private bool _dragging = false;
 	private bool _colourSettingsActive = false;
+	[Parameter]
+	public BackgroundMesh? backgroundMesh { get; set; }
+	[Parameter]
+	public EventCallback<BackgroundMesh> onSaveClicked { get; set; }
 
 	protected override async Task OnInitializedAsync()
 	{
-		backgroundMesh = new BackgroundMesh
-			{
-				BackgroundColour = new RadialGradient { HPosPercent = 0, VPosPercent = 0, H = 237, S = 100, L = 50, A = 1, Alpha = 100 },
-				ColourPoints = new List<RadialGradient>
-			{
-				new RadialGradient {HPosPercent = 55, VPosPercent = 68, H = 228, S = 40, L = 83, A = 1, Alpha = 50, LayerHeight = 1},
-				new RadialGradient {HPosPercent = 38, VPosPercent = 31, H = 200, S = 100, L = 50, A = 0.84f, Alpha = 50, LayerHeight = 2},
-				new RadialGradient {HPosPercent = 24, VPosPercent = 60, H = 310, S = 95, L = 60, A = 1, Alpha = 50, LayerHeight = 3},
-				new RadialGradient {HPosPercent = 67, VPosPercent = 41, H = 100, S = 95, L = 62, A = 1, Alpha = 50, LayerHeight = 4},
-				new RadialGradient {HPosPercent = 0, VPosPercent = 100, H = 100, S = 0, L = 73, A = 1, Alpha = 50, LayerHeight = 5},
-				new RadialGradient {HPosPercent = 80, VPosPercent = 100, H = 201, S = 57, L = 76, A = 1, Alpha = 50, LayerHeight = 6},
-				new RadialGradient {HPosPercent = 15, VPosPercent = 20, H = 258, S = 100, L = 11, A = 1, Alpha = 50, LayerHeight = 7}
-			}
-			};
+		if(backgroundMesh == null)
+		{
+			backgroundMesh = new BackgroundMesh();
+			backgroundMesh.ColourPoints = GetSeedColourPoints();
+		}
+
 		RenderBackground();
 		UpdateColourPoints();
 
@@ -115,25 +111,20 @@
 		}
 	}
 
+	protected async Task Save()
+	{
+		await onSaveClicked.InvokeAsync(backgroundMesh);
+	}
+
 	public void RenderBackground()
 	{
-		backgroundCss = $"background-color: {GetHSLACss(backgroundMesh.BackgroundColour)};";
-		backgroundCss += $"background-image: ";
 
-		foreach (var colourPoint in backgroundMesh.ColourPoints.OrderBy(c => c.LayerHeight))
-		{
-			backgroundCss += $"radial-gradient(at {colourPoint.HPosPercent}% {colourPoint.VPosPercent}%, {GetHSLACss(colourPoint)} 0px, transparent {colourPoint.Alpha}%),";
-		}
-		backgroundCss = backgroundCss.Remove(backgroundCss.Length - 1, 1) + ";";
+		backgroundCss = BackgroundMeshToCss.GetBackgroundMeshCss(backgroundMesh);
 		StateHasChanged();
 	}
 
-	public string GetHSLACss(RadialGradient sourceColourPoint)
-	{
-		return $"hsla({sourceColourPoint.H}, {sourceColourPoint.S}%, {sourceColourPoint.L}%, {sourceColourPoint.A})";
-	}
 
-	public void SelectColourPoint(RadialGradient colourPoint)
+	public void SelectColourPoint(ColourPoint colourPoint)
 	{
 		_colourPoint = colourPoint;
 	}
@@ -185,5 +176,18 @@
 		StateHasChanged();
 	}
 
-
+	public List<ColourPoint> GetSeedColourPoints()
+	{
+		return new List<ColourPoint>
+			{
+				new ColourPoint { HPosPercent = 0, VPosPercent = 0, H = 237, S = 100, L = 50, A = 1, Alpha = 100, IsBackground = true },
+				new ColourPoint { HPosPercent = 55, VPosPercent = 68, H = 228, S = 40, L = 83, A = 1, Alpha = 50, LayerHeight = 1 },
+				new ColourPoint { HPosPercent = 38, VPosPercent = 31, H = 200, S = 100, L = 50, A = 0.84f, Alpha = 50, LayerHeight = 2 },
+				new ColourPoint { HPosPercent = 24, VPosPercent = 60, H = 310, S = 95, L = 60, A = 1, Alpha = 50, LayerHeight = 3 },
+				new ColourPoint { HPosPercent = 67, VPosPercent = 41, H = 100, S = 95, L = 62, A = 1, Alpha = 50, LayerHeight = 4 },
+				new ColourPoint { HPosPercent = 0, VPosPercent = 100, H = 100, S = 0, L = 73, A = 1, Alpha = 50, LayerHeight = 5 },
+				new ColourPoint { HPosPercent = 80, VPosPercent = 100, H = 201, S = 57, L = 76, A = 1, Alpha = 50, LayerHeight = 6 },
+				new ColourPoint { HPosPercent = 15, VPosPercent = 20, H = 258, S = 100, L = 11, A = 1, Alpha = 50, LayerHeight = 7 }
+			};
+	}
 }

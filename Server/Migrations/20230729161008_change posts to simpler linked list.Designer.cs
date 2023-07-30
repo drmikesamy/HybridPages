@@ -3,6 +3,7 @@ using System;
 using HybridPages.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HybridPages.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230729161008_change posts to simpler linked list")]
+    partial class changepoststosimplerlinkedlist
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -370,7 +373,13 @@ namespace HybridPages.Server.Migrations
                     b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<long?>("NextPostId")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("PageId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("PreviousPostId")
                         .HasColumnType("bigint");
 
                     b.Property<long?>("StyleId")

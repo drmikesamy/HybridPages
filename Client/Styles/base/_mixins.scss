@@ -92,6 +92,25 @@
 	}
 }
 
+@mixin responsive-max-width {
+
+	@media only screen and (min-width: $large-mobile-screen-size) {
+		max-width: 700px;
+	}
+
+	@media only screen and (min-width: $tablet-screen-size) {
+		max-width: 800px;
+	}
+
+	@media only screen and (min-width: $desktop-screen-size) {
+		max-width: 900px;
+	}
+
+	@media only screen and (min-width: $large-desktop-screen-size) {
+		max-width: 1000px;
+	}
+}
+
 .hide-on-mobile {
 	@include display-on-tablet-upwards;
 }
@@ -115,4 +134,14 @@
 	display: grid;
 	grid-template-rows: repeat(auto);
 	@include responsive-grid-gap;
+	justify-items: stretch;
+}
+
+@mixin fullwidth-centred-content {
+	display: grid;
+	justify-items: center;
+	& > article{
+		@include responsive-max-width;
+		width: 100%;
+	}
 }

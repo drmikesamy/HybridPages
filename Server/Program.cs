@@ -32,6 +32,7 @@ builder.Services.AddAuthentication()
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+builder.Services.AddSwaggerGen();
 
 var mapperConfig = new MapperConfiguration(cfg =>
 {
@@ -48,6 +49,12 @@ if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
     app.UseWebAssemblyDebugging();
+	app.UseSwagger();
+	app.UseSwaggerUI(c =>
+	{
+		c.SwaggerEndpoint("/swagger/v1/swagger.json", "Blazor API V1");
+	});
+
 }
 else
 {
@@ -66,6 +73,15 @@ app.UseRouting();
 app.UseIdentityServer();
 app.UseAuthorization();
 
+using (var scope = app.Services.CreateScope())
+{
+	var userManager = (UserManager<ApplicationUser>)scope.ServiceProvider.GetService(typeof(UserManager<ApplicationUser>));
+	var roleManager = (RoleManager<IdentityRole>)scope.ServiceProvider.GetService(typeof(RoleManager<IdentityRole>));
+
+	ApplicationDbInitialiser.SeedRolesAndUsers(userManager, roleManager);
+}
+
+app.UseCors("CorsAllowAll");
 
 app.MapRazorPages();
 app.MapControllers();

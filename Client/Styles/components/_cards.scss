@@ -1,16 +1,23 @@
-.card {
-    background-color: $white-transparent;
-    border-radius: $default-border-radius;
-    @include responsive-content-padding;
-    @include default-row-grid;
-}
+//Jumbo Banner
 
-.img {
-    width: 140px;
-    height: 140px;
+.jumbo-banner {
     background-size: cover;
-    border-radius: 70px;
-    justify-self: center;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-top: $base-spacing*5;
+    margin-bottom: $base-spacing*5;
+
+    h1 {
+        font-size: $base-font-size*6;
+        color: white;
+        text-shadow: $default-shadow;
+    }
+
+    h5 {
+        font-size: $base-font-size*3;
+        color: white;
+        text-shadow: $default-shadow;
+    }
 }
 
 //background designer
@@ -21,6 +28,7 @@
     right: 0px;
     top: 0px;
     bottom: 0px;
+    z-index: 1;
 }
 
 .draggable-circle {
@@ -69,4 +77,11 @@
     position: fixed;
     left: 10px;
     top: 10px;
+}
+
+.fixed-button-bottom-right{
+    position: fixed;
+    bottom: 250px;
+    right: 10px;
+    width: 100px;
 }

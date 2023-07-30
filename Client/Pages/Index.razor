@@ -1,39 +1,90 @@
 ﻿@page "/"
 @page "/{UniqueName}"
 @using System.Text.RegularExpressions;
+@using HybridPages.Client.Shared.EditorComponents
+@using HybridPages.Client.Shared.LayoutComponents
+@using HybridPages.Shared.Enums;
+@using HybridPages.Shared.Helpers;
+@using HybridPages.Shared.Interfaces;
 @using HybridPages.Shared.Models;
-@using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+@using HybridPages.Shared.Models.Styling;
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using System.Text.Json;
+@inject NavigationManager NavManager
 @inject HttpClient Http
-
-<div class="card-list">
-	<PageTitle>Index</PageTitle>
-	@if (page == null)
+@if (_showBackgroundDesigner == true)
+{
+	<BackgroundDesigner backgroundMesh=@_page?.Style?.BackgroundMesh onSaveClicked="b => HideBackgroundDesigner(b)"></BackgroundDesigner>
+}
+<PageTitle>Index</PageTitle>
+<div class="background-container" style="@_backgroundMeshCss"></div>
+<nav class="primary-nav">
+	<div class="primary-nav-left">
+		<h1>@_page?.Title</h1>
+	</div>
+	<div class="primary-nav-right">
+		<LoginDisplay />
+		<AuthorizeView Context="authContext">
+			<Authorized>
+				<button @onclick="ShowBackgroundDesigner">Edit Background</button>
+			</Authorized>
+		</AuthorizeView>
+	</div>
+</nav>
+<div class="content-container">
+	@if (_page == null)
 	{
-		<div class="card">
+		<article class="card">
 			<p><em>Loading...</em></p>
-		</div>
+		</article>
 	}
 	else
 	{
-		<div class="img" style="background-image: url('images/lorelle.jpg')">
-		</div>
-		@foreach (var post in page.Posts)
+		@foreach (var post in _page.Posts)
 		{
-			<div class="card">
-				<EditForm Model="@post" OnSubmit="@Save">
-					<InputText @bind-Value="post.Content" />
+			<section style="background-image:url('')" @onclick="() => SelectPost(post)">
+				@switch (post.Type)
+				{
+					case PostTypeEnum.JumboBanner:
+						<JumboBanner post="@post"></JumboBanner>
+						break;
+					default:
 
-					<button type="submit">Submit</button>
-				</EditForm>
-			</div>
+						<article class="card" draggable="true">
+							@post.Content
+						</article>
+
+						break;
+				}
+			</section>
+			@if (post == _selectedPost)
+			{
+				<AuthorizeView Context="authContext">
+					<Authorized>
+						<section>
+							<article class="card">
+								<SectionEditor Post="@_selectedPost" AllPosts="@_page.Posts" PostChanged="() => StateHasChanged()"></SectionEditor>
+							</article>
+						</section>
+					</Authorized>
+				</AuthorizeView>
+			}
 		}
+	}
+	<button @onclick="AddPost">Add Post</button>
+	if(_page != null){
+	@(JsonSerializer.Serialize(_page, new JsonSerializerOptions() { WriteIndented = true }))
 	}
 </div>
 
 @code {
 	[Parameter]
-	public string UniqueName { get; set; }
-	private Page? page { get; set; }
+	public string? UniqueName { get; set; }
+	private Page _page { get; set; } = new();
+	private string _backgroundMeshCss { get; set; } = string.Empty;
+	private bool _showBackgroundDesigner { get; set; } = false;
+	private Post _selectedPost { get; set; }
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -41,23 +92,76 @@
 		{
 			try
 			{
-				page = await Http.GetFromJsonAsync<Page>("page/" + UniqueName);
-				if (page == null)
-					page = new Page
-						{
-							UniqueName = UniqueName,
-							Posts = new List<Post> { new Post() }
-						};
+				var page = await Http.GetFromJsonAsync<Page>("page/" + UniqueName);
+
+				if (page != null)
+				{
+					_page = page;
+					if (_page?.Style?.BackgroundType == BackgroundTypeEnum.Mesh && _page?.Style?.BackgroundMesh != null)
+						_backgroundMeshCss = BackgroundMeshToCss.GetBackgroundMeshCss(_page.Style.BackgroundMesh);
+				}
 			}
 			catch (AccessTokenNotAvailableException exception)
 			{
 				exception.Redirect();
 			}
 		}
+		else
+		{
+			NavManager.NavigateTo("/start");
+		}
+	}
+
+	public void SelectPost(Post post)
+	{
+		_selectedPost = post;
+		StateHasChanged();
+	}
+
+	public async void AddPost()
+	{
+		var newPost = new Post();
+
+		var response = await Http.PostAsJsonAsync<Tuple<Post, string>>("post", new Tuple<Post, string>(newPost, _page.UniqueName), CancellationToken.None);
+
+		var responseContent = await response.Content.ReadAsStringAsync();
+
+		var postId = long.Parse(responseContent);
+
+		newPost.Id = postId;
+
+		_page.Posts.AddLast(newPost);
+
+		_selectedPost = newPost;
+		StateHasChanged();
+	}
+
+	public void ShowBackgroundDesigner()
+	{
+		_showBackgroundDesigner = true;
+	}
+	public async void HideBackgroundDesigner(BackgroundMesh backgroundMesh)
+	{
+		_showBackgroundDesigner = false;
+
+		if (_page.Style == null)
+		{
+			_page.Style = new Style();
+		}
+		_page.Style.BackgroundType = BackgroundTypeEnum.Mesh;
+		_page.Style.BackgroundMesh = backgroundMesh;
+
+		await Save();
+		_backgroundMeshCss = BackgroundMeshToCss.GetBackgroundMeshCss(backgroundMesh);
+		StateHasChanged();
 	}
 
 	public async Task Save()
 	{
-		var response = await Http.PostAsJsonAsync("page", page, CancellationToken.None);
+		var response = await Http.PostAsJsonAsync<Page>("page", _page, CancellationToken.None);
+		var responseContent = await response.Content.ReadAsStringAsync();
+		var pageId = long.Parse(responseContent);
+		_page.Id = pageId;
+		StateHasChanged();
 	}
 }

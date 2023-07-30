@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HybridPages.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230619171557_change to post structure")]
-    partial class changetopoststructure
+    [Migration("20230728162025_add style schema")]
+    partial class addstyleschema
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -218,6 +218,9 @@ namespace HybridPages.Server.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
+                    b.Property<long>("UserProfileId")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
@@ -227,7 +230,54 @@ namespace HybridPages.Server.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
+                    b.HasIndex("UserProfileId");
+
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("HybridPages.Shared.Models.Font", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FontFace")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FontPath")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Fonts", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FontFace = "Open Sans",
+                            FontPath = "/css/fonts/open-sans/OpenSans-Regular.ttf",
+                            ModifiedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FontFace = "Arsenal",
+                            FontPath = "/css/fonts/arsenal/Arsenal-Regular.ttf",
+                            ModifiedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
                 });
 
             modelBuilder.Entity("HybridPages.Shared.Models.Page", b =>
@@ -241,15 +291,15 @@ namespace HybridPages.Server.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<long>("CreatorId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("FeaturedImageUrl")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("StyleId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -262,13 +312,14 @@ namespace HybridPages.Server.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<long>("UserProfileId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatorId");
+                    b.HasIndex("StyleId");
+
+                    b.HasIndex("UserProfileId");
 
                     b.ToTable("Pages", (string)null);
                 });
@@ -284,19 +335,14 @@ namespace HybridPages.Server.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Key")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Key")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<long>("PageId")
                         .HasColumnType("bigint");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("Value")
                         .IsRequired()
@@ -330,6 +376,9 @@ namespace HybridPages.Server.Migrations
                     b.Property<long>("PageId")
                         .HasColumnType("bigint");
 
+                    b.Property<long?>("StyleId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
@@ -337,18 +386,16 @@ namespace HybridPages.Server.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("integer");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.HasKey("Id");
 
                     b.HasIndex("PageId");
 
-                    b.ToTable("Links", (string)null);
+                    b.HasIndex("StyleId");
+
+                    b.ToTable("Posts", (string)null);
                 });
 
-            modelBuilder.Entity("HybridPages.Shared.Models.UserMeta", b =>
+            modelBuilder.Entity("HybridPages.Shared.Models.PostMeta", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -366,15 +413,11 @@ namespace HybridPages.Server.Migrations
                     b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<long>("PageId")
+                    b.Property<long>("PostId")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<long?>("UserProfileId")
-                        .HasColumnType("bigint");
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Value")
                         .IsRequired()
@@ -382,11 +425,292 @@ namespace HybridPages.Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PageId");
+                    b.HasIndex("PostId");
 
-                    b.HasIndex("UserProfileId");
+                    b.ToTable("PostMeta", (string)null);
+                });
 
-                    b.ToTable("UserMeta", (string)null);
+            modelBuilder.Entity("HybridPages.Shared.Models.Style", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("BackgroundColour")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("BackgroundImageUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("BackgroundMeshId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("BackgroundType")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("HeadingFontColour")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("HeadingFontFaceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ParagraphFontColour")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("ParagraphFontFaceId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BackgroundMeshId");
+
+                    b.HasIndex("HeadingFontFaceId");
+
+                    b.HasIndex("ParagraphFontFaceId");
+
+                    b.ToTable("Styles", (string)null);
+                });
+
+            modelBuilder.Entity("HybridPages.Shared.Models.Styling.BackgroundMesh", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BackgroundMeshes", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ModifiedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
+                });
+
+            modelBuilder.Entity("HybridPages.Shared.Models.Styling.ColourPoint", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<float>("A")
+                        .HasColumnType("real");
+
+                    b.Property<int>("Alpha")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("BackgroundMeshId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("H")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("HPosAbs")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("HPosPercent")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsBackground")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("L")
+                        .HasColumnType("integer");
+
+                    b.Property<float>("LayerHeight")
+                        .HasColumnType("real");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("S")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("VPosAbs")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("VPosPercent")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BackgroundMeshId");
+
+                    b.ToTable("ColourPoints", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            A = 1f,
+                            Alpha = 100,
+                            BackgroundMeshId = 1L,
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            H = 237,
+                            HPosAbs = 0,
+                            HPosPercent = 0,
+                            IsBackground = true,
+                            L = 50,
+                            LayerHeight = 0f,
+                            ModifiedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            S = 100,
+                            VPosAbs = 0,
+                            VPosPercent = 0
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            A = 1f,
+                            Alpha = 50,
+                            BackgroundMeshId = 1L,
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            H = 228,
+                            HPosAbs = 0,
+                            HPosPercent = 55,
+                            IsBackground = false,
+                            L = 83,
+                            LayerHeight = 1f,
+                            ModifiedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            S = 40,
+                            VPosAbs = 0,
+                            VPosPercent = 68
+                        },
+                        new
+                        {
+                            Id = 3L,
+                            A = 0.84f,
+                            Alpha = 50,
+                            BackgroundMeshId = 1L,
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            H = 200,
+                            HPosAbs = 0,
+                            HPosPercent = 38,
+                            IsBackground = false,
+                            L = 50,
+                            LayerHeight = 2f,
+                            ModifiedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            S = 100,
+                            VPosAbs = 0,
+                            VPosPercent = 31
+                        },
+                        new
+                        {
+                            Id = 4L,
+                            A = 1f,
+                            Alpha = 50,
+                            BackgroundMeshId = 1L,
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            H = 310,
+                            HPosAbs = 0,
+                            HPosPercent = 24,
+                            IsBackground = false,
+                            L = 60,
+                            LayerHeight = 3f,
+                            ModifiedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            S = 95,
+                            VPosAbs = 0,
+                            VPosPercent = 60
+                        },
+                        new
+                        {
+                            Id = 5L,
+                            A = 1f,
+                            Alpha = 50,
+                            BackgroundMeshId = 1L,
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            H = 100,
+                            HPosAbs = 0,
+                            HPosPercent = 67,
+                            IsBackground = false,
+                            L = 62,
+                            LayerHeight = 4f,
+                            ModifiedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            S = 95,
+                            VPosAbs = 0,
+                            VPosPercent = 41
+                        },
+                        new
+                        {
+                            Id = 6L,
+                            A = 1f,
+                            Alpha = 50,
+                            BackgroundMeshId = 1L,
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            H = 100,
+                            HPosAbs = 0,
+                            HPosPercent = 0,
+                            IsBackground = false,
+                            L = 73,
+                            LayerHeight = 5f,
+                            ModifiedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            S = 0,
+                            VPosAbs = 0,
+                            VPosPercent = 100
+                        },
+                        new
+                        {
+                            Id = 7L,
+                            A = 1f,
+                            Alpha = 50,
+                            BackgroundMeshId = 1L,
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            H = 201,
+                            HPosAbs = 0,
+                            HPosPercent = 80,
+                            IsBackground = false,
+                            L = 76,
+                            LayerHeight = 6f,
+                            ModifiedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            S = 57,
+                            VPosAbs = 0,
+                            VPosPercent = 100
+                        },
+                        new
+                        {
+                            Id = 8L,
+                            A = 1f,
+                            Alpha = 50,
+                            BackgroundMeshId = 1L,
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            H = 258,
+                            HPosAbs = 0,
+                            HPosPercent = 15,
+                            IsBackground = false,
+                            L = 11,
+                            LayerHeight = 7f,
+                            ModifiedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            S = 100,
+                            VPosAbs = 0,
+                            VPosPercent = 20
+                        });
                 });
 
             modelBuilder.Entity("HybridPages.Shared.Models.UserProfile", b =>
@@ -398,11 +722,9 @@ namespace HybridPages.Server.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<string>("AvatarUrl")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Bio")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedDate")
@@ -412,7 +734,6 @@ namespace HybridPages.Server.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("UserId")
@@ -422,6 +743,38 @@ namespace HybridPages.Server.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("UserProfiles", (string)null);
+                });
+
+            modelBuilder.Entity("HybridPages.Shared.Models.UserProfileMeta", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("UserProfileId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserProfileId");
+
+                    b.ToTable("UserProfileMeta", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -560,26 +913,39 @@ namespace HybridPages.Server.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("HybridPages.Shared.Models.Page", b =>
+            modelBuilder.Entity("HybridPages.Server.Models.ApplicationUser", b =>
                 {
-                    b.HasOne("HybridPages.Shared.Models.UserProfile", "Creator")
-                        .WithMany("Pages")
-                        .HasForeignKey("CreatorId")
+                    b.HasOne("HybridPages.Shared.Models.UserProfile", "UserProfile")
+                        .WithMany()
+                        .HasForeignKey("UserProfileId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Creator");
+                    b.Navigation("UserProfile");
+                });
+
+            modelBuilder.Entity("HybridPages.Shared.Models.Page", b =>
+                {
+                    b.HasOne("HybridPages.Shared.Models.Style", "Style")
+                        .WithMany()
+                        .HasForeignKey("StyleId");
+
+                    b.HasOne("HybridPages.Shared.Models.UserProfile", null)
+                        .WithMany("Pages")
+                        .HasForeignKey("UserProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Style");
                 });
 
             modelBuilder.Entity("HybridPages.Shared.Models.PageMeta", b =>
                 {
-                    b.HasOne("HybridPages.Shared.Models.Page", "Page")
+                    b.HasOne("HybridPages.Shared.Models.Page", null)
                         .WithMany("PageMeta")
                         .HasForeignKey("PageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Page");
                 });
 
             modelBuilder.Entity("HybridPages.Shared.Models.Post", b =>
@@ -589,21 +955,64 @@ namespace HybridPages.Server.Migrations
                         .HasForeignKey("PageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("HybridPages.Shared.Models.Style", "Style")
+                        .WithMany()
+                        .HasForeignKey("StyleId");
+
+                    b.Navigation("Style");
                 });
 
-            modelBuilder.Entity("HybridPages.Shared.Models.UserMeta", b =>
+            modelBuilder.Entity("HybridPages.Shared.Models.PostMeta", b =>
                 {
-                    b.HasOne("HybridPages.Shared.Models.Page", "Page")
+                    b.HasOne("HybridPages.Shared.Models.Post", null)
+                        .WithMany("PostMeta")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("HybridPages.Shared.Models.Style", b =>
+                {
+                    b.HasOne("HybridPages.Shared.Models.Styling.BackgroundMesh", "BackgroundMesh")
                         .WithMany()
-                        .HasForeignKey("PageId")
+                        .HasForeignKey("BackgroundMeshId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("HybridPages.Shared.Models.Font", "HeadingFontFace")
+                        .WithMany()
+                        .HasForeignKey("HeadingFontFaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HybridPages.Shared.Models.Font", "ParagraphFontFace")
+                        .WithMany()
+                        .HasForeignKey("ParagraphFontFaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BackgroundMesh");
+
+                    b.Navigation("HeadingFontFace");
+
+                    b.Navigation("ParagraphFontFace");
+                });
+
+            modelBuilder.Entity("HybridPages.Shared.Models.Styling.ColourPoint", b =>
+                {
+                    b.HasOne("HybridPages.Shared.Models.Styling.BackgroundMesh", null)
+                        .WithMany("ColourPoints")
+                        .HasForeignKey("BackgroundMeshId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("HybridPages.Shared.Models.UserProfileMeta", b =>
+                {
                     b.HasOne("HybridPages.Shared.Models.UserProfile", null)
                         .WithMany("UserMeta")
                         .HasForeignKey("UserProfileId");
-
-                    b.Navigation("Page");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -662,6 +1071,16 @@ namespace HybridPages.Server.Migrations
                     b.Navigation("PageMeta");
 
                     b.Navigation("Posts");
+                });
+
+            modelBuilder.Entity("HybridPages.Shared.Models.Post", b =>
+                {
+                    b.Navigation("PostMeta");
+                });
+
+            modelBuilder.Entity("HybridPages.Shared.Models.Styling.BackgroundMesh", b =>
+                {
+                    b.Navigation("ColourPoints");
                 });
 
             modelBuilder.Entity("HybridPages.Shared.Models.UserProfile", b =>

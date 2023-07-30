@@ -7,9 +7,16 @@ namespace HybridPages.Shared.Enums
 {
     public enum PostTypeEnum
     {
-        Url = 0,
+        Text = 0,
         Image = 1,
         YouTube = 2,
-        Vimeo = 3
+        Vimeo = 3,
+        Map = 4,
+        JumboBanner = 5,
+        Footer = 6,
+        Team = 7,
+        Contact = 8,
+        MailingList = 9,
+        Event = 10
     }
 }

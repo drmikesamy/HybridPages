@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace HybridPages.Shared.Models
 {
-    public class UserMeta : BaseEntity<UserMeta>
+    public class UserProfileMeta : BaseEntity<UserProfileMeta>
     {
-        public long UserId { get; set; }
         public string Key { get; set; }
         public string Value { get; set; }
     }

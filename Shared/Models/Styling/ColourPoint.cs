@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HybridPages.Shared.Models.Styling
 {
-	public class RadialGradient : BaseEntity<RadialGradient>
+	public class ColourPoint : BaseEntity<ColourPoint>
 	{
 		public int HPosPercent { get; set; }
 		public int VPosPercent { get; set; }
@@ -18,5 +18,7 @@ namespace HybridPages.Shared.Models.Styling
 		public float A { get; set; }
 		public int Alpha { get; set; }
 		public float LayerHeight { get; set; }
+		public bool IsBackground { get; set; } = false;
+		public long BackgroundMeshId { get; set; }
 	}
 }

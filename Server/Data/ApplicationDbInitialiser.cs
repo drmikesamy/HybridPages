@@ -1,6 +1,7 @@
 ﻿using HybridPages.Server.Enums;
 using HybridPages.Server.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace HybridPages.Server.Data
 {
@@ -8,7 +9,7 @@ namespace HybridPages.Server.Data
     {
         public static void SeedRolesAndUsers(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
-            foreach (var roleName in Enum.GetNames(typeof(RoleEnum)))
+			foreach (var roleName in Enum.GetNames<RoleEnum>())
             {
                 if (roleManager.FindByNameAsync(roleName).Result == null)
                 {
@@ -24,7 +25,7 @@ namespace HybridPages.Server.Data
             {
                 ApplicationUser user = new ApplicationUser
                 {
-                    UserName = "test",
+                    UserName = "test@test.test",
                     Email = "test@test.test"
                 };
 

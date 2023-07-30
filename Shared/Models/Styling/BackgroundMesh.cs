@@ -8,7 +8,9 @@ namespace HybridPages.Shared.Models.Styling
 {
     public class BackgroundMesh : BaseEntity<BackgroundMesh>
 	{
-        public RadialGradient BackgroundColour { get; set; }
-		public List<RadialGradient> ColourPoints { get; set; }
+		public ICollection<ColourPoint> ColourPoints { get; set; }
+        public BackgroundMesh() {
+            ColourPoints = new HashSet<ColourPoint>();
+        }
     }
 }

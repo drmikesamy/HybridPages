@@ -10,15 +10,16 @@ namespace HybridPages.Shared.Models
 {
     public class UserProfile : BaseEntity<UserProfile>
     {
-        public string Name { get; set; }
-        public string Bio { get; set; }
-        public string AvatarUrl { get; set; }
-        public virtual ICollection<UserMeta> UserMeta { get; set; }
-        [InverseProperty("Creator")]
+        public string UserId { get; set; }
+        public string? Name { get; set; }
+        public string? Bio { get; set; }
+        public string? AvatarUrl { get; set; }
+        public virtual ICollection<UserProfileMeta> UserMeta { get; set; }
         public virtual ICollection<Page> Pages { get; set; }
         public UserProfile()
         {
             Pages = new HashSet<Page>();
+			UserMeta = new HashSet<UserProfileMeta>();
         }
     }
 }

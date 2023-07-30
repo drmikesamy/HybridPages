@@ -10,8 +10,7 @@ namespace HybridPages.Shared.Models
     public class PageMeta : BaseEntity<PageMeta>
     {
         public long PageId { get; set; }
-        public string Key { get; set; }
-        public string Value { get; set; }
-		public PageMetaEnum Type { get; set; }
+		public PageMetaEnum Key { get; set; }
+		public string Value { get; set; }
 	}
 }
