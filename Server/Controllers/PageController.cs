@@ -27,7 +27,8 @@ namespace HybridPages.Server.Controllers
 		{
 			var page = await _context.Pages
 				.Include(m => m.PageMeta)
-				.Include(m => m.Posts)
+				.Include(m => m.Posts.OrderBy(p => Convert.ToInt32(p.PostMeta.Single(pm => pm.Key == PostMetaEnum.Order.ToString()).Value)))
+				.ThenInclude(p => p.PostMeta)
 				.Include(m => m.Style.HeadingFontFace)
 				.Include(m => m.Style.ParagraphFontFace)
 				.Include(m => m.Style.BackgroundMesh.ColourPoints)
@@ -62,6 +63,26 @@ namespace HybridPages.Server.Controllers
 			var userProfile = _context.UserProfiles.First(u => u.UserId == userId);
 			page.UserProfileId = userProfile.Id;
 
+			var i = 0;
+			var orderKey = PostMetaEnum.Order.ToString();
+
+			foreach (var post in page.Posts)
+			{
+				var orderEntry = post.PostMeta.SingleOrDefault(o => o.Key == orderKey);
+
+				if (orderEntry == null)
+				{
+					var newOrderEntry = new PostMeta { Key = orderKey, PostId = post.Id, Value = i.ToString() };
+					post.PostMeta.Add(newOrderEntry);
+				}
+				else if (orderEntry.Value != i.ToString())
+				{
+					orderEntry.Value = i.ToString();
+				}
+
+				i++;
+			}
+
 			if (existingPage == null)
 			{
 				_context.Pages.Add(page);
@@ -83,70 +104,6 @@ namespace HybridPages.Server.Controllers
 			_context.Pages.Remove(page);
 			await _context.SaveChangesAsync();
 			return Ok();
-		}
-	}
-}
-
-
-public class Person
-{
-	public Person() { }
-	public Person(int id, string name) {
-		Name = name;
-		Id = id;
-	}
-
-	public int Id { get; set; }
-	public string Name { get; set; }
-
-	public string FetchCargo(int id)
-	{
-		//query dartabase for cargo
-		return "cargo";
-	}
-	public string FetchAllCargoes(List<int> ids)
-	{
-		//query dartabase for cargo
-		return "cargoes";
-	}
-}
-
-public class LizardPerson : Person {
-	public int TailLength { get; set; }
-	public LizardPerson() {
-		Name = "lizard man";
-	}
-}
-
-public class People
-{
-	public List<Person> Peoples { get; set; }
-
-
-	public People()
-	{
-
-		Peoples = new List<Person>();
-
-		Peoples.Add(new Person(1, "Lorelle"));
-		Peoples.Add(new Person { Id = 2, Name = "John" });
-		Peoples.Add(new Person { Id = 3, Name = "Mike" });
-		Peoples.Add(new Person { Id = 4, Name = "Potato" });
-		Peoples.Add(new Person { Id = 5, Name = "Burt" });
-
-		var namesOnly = Peoples.Select(x => x.FetchCargo(x.Id)).ToList();
-
-		var cargoids = Peoples.Select(x => x.Id).ToList();
-		new Person().FetchAllCargoes(cargoids);
-
-
-		//Traditional way of doing the same thing
-
-		var namesOnlyTraditional = new List<string>();
-
-		foreach (var x in Peoples)
-		{
-			namesOnlyTraditional.Add(x.Name);
 		}
 	}
 }

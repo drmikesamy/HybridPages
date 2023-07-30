@@ -7,9 +7,6 @@ namespace HybridPages.Shared.Enums
 {
     public enum PostMetaEnum
     {
-        FontFamily = 0,
-        Pinned = 1,
-        YouTube = 2,
-        Vimeo = 3
+        Order = 0
     }
 }
