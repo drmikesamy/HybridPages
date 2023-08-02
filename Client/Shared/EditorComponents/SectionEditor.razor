@@ -1,48 +1,65 @@
-﻿@using HybridPages.Shared.Enums;
+﻿@using HybridPages.Client.State;
+@using HybridPages.Shared.Enums;
 @using HybridPages.Shared.Interfaces;
 @using HybridPages.Shared.Models;
 @using HybridPages.Shared.Helpers;
-<section>
-	<article>
-		<input type="text" @bind="Post.Title" />
-		<input type="text" @bind="Post.Content" />
-		<button @onclick="UpdateContent">Update Content</button>
-		@if (Post?.Id != AllPosts?.First?.Value.Id)
-		{
-			<button @onclick="MoveUp">Move Up</button>
-		}
-		@if (Post?.Id != AllPosts?.Last?.Value.Id)
-		{
-			<button @onclick="MoveDown">Move Down</button>
-		}
+@inject PageService _pageService;
 
-	</article>
-</section>
+@if (_pageService.SelectedPost != null)
+{
+	<AuthorizeView Context="authContext">
+		<Authorized>
+			<section class="section-editor">
+				<article>
+					<input type="text" @bind-value="Title" @bind-value:event="oninput" />
+					<input type="text" @bind-value="Content" @bind-value:event="oninput" />
+					@if (_pageService.SelectedPost?.Id != _pageService.Page?.Posts?.First?.Value.Id)
+					{
+						<button @onclick="_pageService.MoveUp">Move Up</button>
+					}
+					@if (_pageService.SelectedPost?.Id != _pageService.Page?.Posts?.Last?.Value.Id)
+					{
+						<button @onclick="_pageService.MoveDown">Move Down</button>
+					}
+				</article>
+			</section>
+		</Authorized>
+	</AuthorizeView>
+}
 
 @code {
-	[Parameter]
-	public LinkedList<Post> AllPosts { get; set; }
-
-	[Parameter]
-	public Post Post { get; set; }
-
-	[Parameter]
-	public EventCallback PostChanged { get; set; }
-
-	public async void MoveUp()
+	protected override async Task OnInitializedAsync()
 	{
-		AllPosts.MoveUp(Post);
-		await UpdateContent();
+		_pageService.OnStateChange += StateHasChanged;
 	}
-
-	public async void MoveDown()
+	public string Title
 	{
-		AllPosts.MoveDown(Post);
-		await UpdateContent();
+		get
+		{
+			return _pageService.SelectedPost?.Title ?? "Title";
+		}
+		set
+		{
+			if (_pageService.SelectedPost != null)
+			{
+				_pageService.SelectedPost.Title = value;
+				_pageService.NotifyStateChanged();
+			}
+		}
 	}
-
-	async Task UpdateContent()
+	public string Content
 	{
-		await PostChanged.InvokeAsync();
+		get
+		{
+			return _pageService.SelectedPost?.Content ?? "Content";
+		}
+		set
+		{
+			if (_pageService.SelectedPost != null)
+			{
+				_pageService.SelectedPost.Content = value;
+				_pageService.NotifyStateChanged();
+			}
+		}
 	}
 }

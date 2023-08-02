@@ -8,20 +8,73 @@
     margin-bottom: $base-spacing*5;
 
     h1 {
-        font-size: $base-font-size*6;
+        font-size: $base-font-size*4;
         color: white;
         text-shadow: $default-shadow;
     }
 
     h5 {
-        font-size: $base-font-size*3;
+        font-size: $base-font-size*1.5;
         color: white;
         text-shadow: $default-shadow;
     }
+
+    @media only screen and (min-width: $large-mobile-screen-size) {
+        h1 {
+            font-size: $base-font-size*4;
+            color: white;
+            text-shadow: $default-shadow;
+        }
+
+        h5 {
+            font-size: $base-font-size*2;
+            color: white;
+            text-shadow: $default-shadow;
+        }
+    }
+
+    @media only screen and (min-width: $tablet-screen-size) {
+        h1 {
+            font-size: $base-font-size*5;
+            color: white;
+            text-shadow: $default-shadow;
+        }
+
+        h5 {
+            font-size: $base-font-size*2.5;
+            color: white;
+            text-shadow: $default-shadow;
+        }
+    }
+
+    @media only screen and (min-width: $desktop-screen-size) {
+        h1 {
+            font-size: $base-font-size*6;
+            color: white;
+            text-shadow: $default-shadow;
+        }
+
+        h5 {
+            font-size: $base-font-size*3;
+            color: white;
+            text-shadow: $default-shadow;
+        }
+    }
+}
+
+//section editor
+.section-editor{
+    background-color: black;
+}
+
+.mouseover-border{
+    border: 1px solid rgba(0,0,0,0);
+}
+.mouseover-border:hover {
+    border: 1px dotted $black;
 }
 
 //background designer
-
 .background-designer {
     position: fixed;
     left: 0px;

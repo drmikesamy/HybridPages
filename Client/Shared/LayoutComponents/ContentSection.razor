@@ -1,0 +1,45 @@
+﻿@using HybridPages.Client.Shared.EditorComponents
+@using HybridPages.Client.State;
+@using HybridPages.Shared.Enums;
+@using HybridPages.Shared.Models;
+@inject PageService _pageService;
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@if (post != null)
+{
+	<section style="background-image:url('');" class="@(_editable ? "mouseover-border" : "")" @onclick="(() => _pageService.SelectPost(post))">
+		@switch (post.Type)
+		{
+			case PostTypeEnum.JumboBanner:
+				<article class="jumbo-banner">
+					<h1>@post.Title</h1>
+					<h5>@post.Content</h5>
+				</article>
+				break;
+			default:
+				<article class="card" draggable="true">
+					@post.Content
+				</article>
+				break;
+		}
+	</section>
+}
+@if (_pageService.SelectedPost == post)
+{
+	<SectionEditor></SectionEditor>
+}
+
+@code {
+	private bool _editable = false;
+	private Task<AuthenticationState> _authenticationStateTask { get; set; }
+
+	[Parameter]
+	public Post post { get; set; } = new Post { Title = "Your title here", Content = "This is your tagline" };
+	protected override async Task OnInitializedAsync()
+	{
+		_pageService.OnStateChange += StateHasChanged;
+		var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+		var user = authenticationState.User;
+		_editable = user.Identity != null && user.Identity.IsAuthenticated;
+	}
+}
