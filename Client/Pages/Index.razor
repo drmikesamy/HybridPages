@@ -1,5 +1,7 @@
 ﻿@page "/"
 @page "/{UniqueName}"
+@page "/{UniqueName}/settings"
+@page "/{UniqueName}/settings/backgrounddesigner"
 @using System.Text.RegularExpressions;
 @using HybridPages.Client.Shared.EditorComponents
 @using HybridPages.Client.Shared.LayoutComponents
@@ -14,27 +16,13 @@
 @using System.Text.Json;
 @inject NavigationManager NavManager
 @inject PageService _pageService
+
 @if (_showBackgroundDesigner == true)
 {
-	<BackgroundDesigner backgroundMesh=@_pageService.Page?.Style?.BackgroundMesh onSaveClicked="b => HideBackgroundDesigner(b)"></BackgroundDesigner>
+	<BackgroundDesigner></BackgroundDesigner>
 }
-<PageTitle>Index</PageTitle>
-<div class="background-container" style="@_backgroundMeshCss"></div>
-<nav class="primary-nav">
-	<div class="primary-nav-left">
-		<h1>@_pageService.Page?.Title</h1>
-	</div>
-	<div class="primary-nav-right">
-		<LoginDisplay />
-		<AuthorizeView Context="authContext">
-			<Authorized>
-				<button @onclick="ShowBackgroundDesigner">Edit Background</button>
-			</Authorized>
-		</AuthorizeView>
-	</div>
-</nav>
-<div class="content-container">
-	@if(_pageService.Page == null)
+<div class="background-container" style="@_backgroundMeshCss">
+	@if (_pageService.Page == null)
 	{
 		<article class="card">
 			<p><em>Loading...</em></p>
@@ -47,12 +35,9 @@
 			<ContentSection post="@post"></ContentSection>
 		}
 	}
-	<button @onclick="() => _pageService.AddPost(PostTypeEnum.JumboBanner)">Add Jumbo Banner</button>
-	<button @onclick="() => _pageService.AddPost(PostTypeEnum.Text)">Add Post</button>
-
-	@(JsonSerializer.Serialize(_pageService.Page, new JsonSerializerOptions() { WriteIndented = true }))
-	
 </div>
+
+@*@(JsonSerializer.Serialize(_pageService.Page, new JsonSerializerOptions() { WriteIndented = true }))*@
 
 @code {
 	[Parameter]
@@ -82,7 +67,7 @@
 		}
 		else
 		{
-			NavManager.NavigateTo("/start");
+			NavManager.NavigateTo("/start", forceLoad: true);
 		}
 	}
 
@@ -91,28 +76,4 @@
 		_pageService.SelectedPost = post;
 		StateHasChanged();
 	}
-
-
-
-	public void ShowBackgroundDesigner()
-	{
-		_showBackgroundDesigner = true;
-	}
-	public async void HideBackgroundDesigner(BackgroundMesh backgroundMesh)
-	{
-		_showBackgroundDesigner = false;
-
-		if (_pageService.Page.Style == null)
-		{
-			_pageService.Page.Style = new Style();
-		}
-		_pageService.Page.Style.BackgroundType = BackgroundTypeEnum.Mesh;
-		_pageService.Page.Style.BackgroundMesh = backgroundMesh;
-
-		await _pageService.Save();
-		_backgroundMeshCss = BackgroundMeshToCss.GetBackgroundMeshCss(backgroundMesh);
-		StateHasChanged();
-	}
-
-
 }

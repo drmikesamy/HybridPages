@@ -1,16 +1,18 @@
-﻿@using HybridPages.Shared.Helpers;
+﻿@using HybridPages.Client.State;
+@using HybridPages.Shared.Helpers;
 @using HybridPages.Shared.Models.Styling;
 @using HybridPages.Shared.Models;
 @inject DOMElements DOMElements;
+@inject PageService _pageService
 
 <div class="background-designer" style="@backgroundCss" @onmousemove="(args) => MouseMove(args)" @onmouseup="(args) => MouseUp(args)" @onmousedown="MouseDown">
 
 	<div class="fixed-debug">
 	</div>
 
-	<button @onclick="() => SelectColourPoint(backgroundMesh.ColourPoints.Where(cp => cp.IsBackground).First())" class="fixed-button-bottom-right @(backgroundMesh.ColourPoints.Where(cp => cp.IsBackground).First() == _colourPoint ? "draggable-circle-highlighted" : "")">Edit BG</button>
+	<button @onclick="() => SelectColourPoint(_pageService.Page.Style.BackgroundMesh.ColourPoints.Where(cp => cp.IsBackground).First())" class="fixed-button-bottom-right @(_pageService.Page.Style.BackgroundMesh.ColourPoints.Where(cp => cp.IsBackground).First() == _colourPoint ? "draggable-circle-highlighted" : "")">Edit BG</button>
 
-	@foreach (var colourPoint in backgroundMesh.ColourPoints.Where(cp => cp.IsBackground == false))
+	@foreach (var colourPoint in _pageService.Page.Style.BackgroundMesh.ColourPoints.Where(cp => cp.IsBackground == false))
 	{
 		<div @onmousedown="() => SelectColourPoint(colourPoint)" @onmousedown:preventDefault="true" class="draggable-circle @(colourPoint == _colourPoint ? "draggable-circle-highlighted" : "")" style="background-color: hsl(@colourPoint.H, @colourPoint.S%, @colourPoint.L%, @colourPoint.A%); left: @(colourPoint.HPosAbs-10)px; top: @(colourPoint.VPosAbs-10)px">
 		</div>
@@ -74,9 +76,6 @@
 				<div class="slider-value">
 				</div>
 			</div>
-			<div class="slider-row">
-				<button @onclick="Save">Save</button>
-			</div>
 		</div>
 	}
 </div>
@@ -87,17 +86,13 @@
 	private ColourPoint? _colourPoint;
 	private bool _dragging = false;
 	private bool _colourSettingsActive = false;
-	[Parameter]
-	public BackgroundMesh? backgroundMesh { get; set; }
-	[Parameter]
-	public EventCallback<BackgroundMesh> onSaveClicked { get; set; }
 
 	protected override async Task OnInitializedAsync()
 	{
-		if(backgroundMesh == null)
+		if (_pageService.Page.Style.BackgroundMesh == null)
 		{
-			backgroundMesh = new BackgroundMesh();
-			backgroundMesh.ColourPoints = GetSeedColourPoints();
+			_pageService.Page.Style.BackgroundMesh = new BackgroundMesh();
+			_pageService.Page.Style.BackgroundMesh.ColourPoints = GetSeedColourPoints();
 		}
 
 		RenderBackground();
@@ -111,15 +106,10 @@
 		}
 	}
 
-	protected async Task Save()
-	{
-		await onSaveClicked.InvokeAsync(backgroundMesh);
-	}
-
 	public void RenderBackground()
 	{
 
-		backgroundCss = BackgroundMeshToCss.GetBackgroundMeshCss(backgroundMesh);
+		backgroundCss = BackgroundMeshToCss.GetBackgroundMeshCss(_pageService.Page.Style.BackgroundMesh);
 		StateHasChanged();
 	}
 
@@ -167,7 +157,7 @@
 	{
 		windowDimensions = await DOMElements.GetWindowDimensions();
 
-		foreach (var colourPoint in backgroundMesh.ColourPoints)
+		foreach (var colourPoint in _pageService.Page.Style.BackgroundMesh.ColourPoints)
 		{
 			colourPoint.HPosAbs = Convert.ToInt32(Math.Round((double)colourPoint.HPosPercent / 100 * windowDimensions.Width, 0));
 			colourPoint.VPosAbs = Convert.ToInt32(Math.Round((double)colourPoint.VPosPercent / 100 * windowDimensions.Height, 0));

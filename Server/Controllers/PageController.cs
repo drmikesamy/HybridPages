@@ -43,8 +43,16 @@ namespace HybridPages.Server.Controllers
 				{
 					UniqueName = uniqueName,
 					Title = uniqueName,
-					FeaturedImageUrl = ""
+					FeaturedImageUrl = "",
+					Posts = new LinkedList<Post>()
 				};
+
+				page.Posts.AddFirst(new Post
+				{
+					Type = PostTypeEnum.JumboBanner,
+					Title = "Your First Post",
+					Content = "Your Tagline Here"
+				});
 
 				await Add(page);
 			}

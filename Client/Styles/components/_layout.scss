@@ -22,42 +22,11 @@ body {
 .content-container {
     @include default-row-grid;
 
-    & > section {
+    & > section, & > nav {
         @include fullwidth-centred-content;
 
-        & > article {
+        & > article, & > ul {
             @include responsive-content-padding;
-        }
-    }
-}
-
-.display-on-mobile {
-    display: none;
-}
-
-@media only screen and (min-width: $large-mobile-screen-size) {
-    .display-on-mobile {
-        display: initial;
-    }
-    header.site-header {
-        img {
-            width: 10rem;
-        }
-    }
-}
-
-@media only screen and (min-width: $tablet-screen-size) {
-    header.site-header {
-        img {
-            width: 10rem;
-        }
-    }
-}
-
-@media only screen and (min-width: $desktop-screen-size) {
-    header.site-header {
-        img {
-            width: 10rem;
         }
     }
 }

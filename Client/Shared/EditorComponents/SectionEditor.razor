@@ -9,10 +9,28 @@
 {
 	<AuthorizeView Context="authContext">
 		<Authorized>
+			<nav class="horizontal-scroll-menu">
+				<ul>
+					<li><a class="@(_pageService.SelectedPost.Type == PostTypeEnum.JumboBanner ? "active" : "")" @onclick="() => _pageService.SetPostType(PostTypeEnum.JumboBanner)">Jumbo Banner</a></li>
+					<li><a class="@(_pageService.SelectedPost.Type == PostTypeEnum.Text ? "active" : "")" @onclick="() => _pageService.SetPostType(PostTypeEnum.Text)">Text</a></li>
+					<li><a class="@(_pageService.SelectedPost.Type == PostTypeEnum.Image ? "active" : "")" @onclick="() => _pageService.SetPostType(PostTypeEnum.Image)">Image</a></li>
+					<li><a class="@(_pageService.SelectedPost.Type == PostTypeEnum.YouTube ? "active" : "")" @onclick="() => _pageService.SetPostType(PostTypeEnum.YouTube)">Video</a></li>
+				</ul>
+			</nav>
 			<section class="section-editor">
 				<article>
-					<input type="text" @bind-value="Title" @bind-value:event="oninput" />
-					<input type="text" @bind-value="Content" @bind-value:event="oninput" />
+					@switch (_pageService.SelectedPost?.Type)
+					{
+						case PostTypeEnum.JumboBanner:
+							<input type="text" @bind-value="Title" @bind-value:event="oninput" />
+							<input type="text" @bind-value="Content" @bind-value:event="oninput" />
+							break;
+						default:
+							<input type="text" @bind-value="Content" @bind-value:event="oninput" />
+							break;
+					}
+
+					
 					@if (_pageService.SelectedPost?.Id != _pageService.Page?.Posts?.First?.Value.Id)
 					{
 						<button @onclick="_pageService.MoveUp">Move Up</button>
@@ -21,6 +39,7 @@
 					{
 						<button @onclick="_pageService.MoveDown">Move Down</button>
 					}
+					<button @onclick="() => _pageService.AddPost(PostTypeEnum.Text)">Add Text Section</button>
 				</article>
 			</section>
 		</Authorized>

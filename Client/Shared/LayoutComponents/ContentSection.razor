@@ -7,22 +7,23 @@
 
 @if (post != null)
 {
-	<section style="background-image:url('');" class="@(_editable ? "mouseover-border" : "")" @onclick="(() => _pageService.SelectPost(post))">
+	<section style="background-image:url('');" class="@(_editable && _pageService.SelectedPost != post ? "mouseover-border" : "") @(_pageService.SelectedPost == post ? "editing-border" : "")" @onclick="(() => _pageService.SelectPost(post))">
 		@switch (post.Type)
 		{
 			case PostTypeEnum.JumboBanner:
 				<article class="jumbo-banner">
-					<h1>@post.Title</h1>
-					<h5>@post.Content</h5>
+					<h1>@(post.Title != null && post.Title != "" ? post.Title : "Title")</h1>
+					<h5>@(post.Content != null && post.Content != "" ? post.Content : "Content")</h5>
 				</article>
 				break;
 			default:
-				<article class="card" draggable="true">
+				<article class="card">
 					@post.Content
 				</article>
 				break;
 		}
 	</section>
+
 }
 @if (_pageService.SelectedPost == post)
 {

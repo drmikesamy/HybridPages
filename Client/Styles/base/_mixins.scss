@@ -76,6 +76,24 @@
 	}
 }
 
+@mixin responsive-navlink-padding {
+	$base-spacing-navlink: $base-spacing/2;
+
+	padding: $base-spacing-navlink $base-spacing;
+
+	@media only screen and (min-width: $large-mobile-screen-size) {
+		padding: $base-spacing-navlink*1.2 $base-spacing*1.2;
+	}
+
+	@media only screen and (min-width: $tablet-screen-size) {
+		padding: $base-spacing-navlink*1.4 $base-spacing*1.4;
+	}
+
+	@media only screen and (min-width: $desktop-screen-size) {
+		padding: $base-spacing-navlink*1.6 $base-spacing*1.6;
+	}
+}
+
 @mixin responsive-text-block-padding {
 	padding: 0 1.5rem;
 
@@ -133,14 +151,13 @@
 @mixin default-row-grid {
 	display: grid;
 	grid-template-rows: repeat(auto);
-	@include responsive-grid-gap;
 	justify-items: stretch;
 }
 
 @mixin fullwidth-centred-content {
 	display: grid;
 	justify-items: center;
-	& > article{
+	& > * {
 		@include responsive-max-width;
 		width: 100%;
 	}

@@ -141,92 +141,54 @@ body {
 .content-container {
   display: grid;
   grid-template-rows: repeat(auto);
-  grid-gap: 1rem;
   justify-items: stretch;
 }
-@media only screen and (min-width: 481px) {
-  .content-container {
-    grid-gap: 0.6rem;
-  }
-}
-@media only screen and (min-width: 769px) {
-  .content-container {
-    grid-gap: 0.8rem;
-  }
-}
-@media only screen and (min-width: 1025px) {
-  .content-container {
-    grid-gap: 1rem;
-  }
-}
-.content-container > section {
+.content-container > section, .content-container > nav {
   display: grid;
   justify-items: center;
 }
-.content-container > section > article {
+.content-container > section > *, .content-container > nav > * {
   width: 100%;
 }
 @media only screen and (min-width: 481px) {
-  .content-container > section > article {
+  .content-container > section > *, .content-container > nav > * {
     max-width: 700px;
   }
 }
 @media only screen and (min-width: 769px) {
-  .content-container > section > article {
+  .content-container > section > *, .content-container > nav > * {
     max-width: 800px;
   }
 }
 @media only screen and (min-width: 1025px) {
-  .content-container > section > article {
+  .content-container > section > *, .content-container > nav > * {
     max-width: 900px;
   }
 }
 @media only screen and (min-width: 1201px) {
-  .content-container > section > article {
+  .content-container > section > *, .content-container > nav > * {
     max-width: 1000px;
   }
 }
-.content-container > section > article {
+.content-container > section > article, .content-container > section > ul, .content-container > nav > article, .content-container > nav > ul {
   padding: 1rem;
 }
 @media only screen and (min-width: 481px) {
-  .content-container > section > article {
+  .content-container > section > article, .content-container > section > ul, .content-container > nav > article, .content-container > nav > ul {
     padding: 1.2rem;
   }
 }
 @media only screen and (min-width: 769px) {
-  .content-container > section > article {
+  .content-container > section > article, .content-container > section > ul, .content-container > nav > article, .content-container > nav > ul {
     padding: 1.4rem;
   }
 }
 @media only screen and (min-width: 1025px) {
-  .content-container > section > article {
+  .content-container > section > article, .content-container > section > ul, .content-container > nav > article, .content-container > nav > ul {
     padding: 1.6rem;
   }
 }
 
-.display-on-mobile {
-  display: none;
-}
-
-@media only screen and (min-width: 481px) {
-  .display-on-mobile {
-    display: initial;
-  }
-  header.site-header img {
-    width: 10rem;
-  }
-}
-@media only screen and (min-width: 769px) {
-  header.site-header img {
-    width: 10rem;
-  }
-}
-@media only screen and (min-width: 1025px) {
-  header.site-header img {
-    width: 10rem;
-  }
-}
 .jumbo-banner {
   background-size: cover;
   background-repeat: no-repeat;
@@ -282,7 +244,10 @@ body {
 }
 
 .section-editor {
-  background-color: black;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+.section-editor article {
+  background-color: rgba(0, 0, 0, 0.2);
 }
 
 .mouseover-border {
@@ -381,4 +346,46 @@ nav.primary-nav {
 }
 nav.primary-nav h1 {
   color: white;
+}
+
+nav.horizontal-scroll-menu {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+nav.horizontal-scroll-menu ul {
+  background-color: rgba(0, 0, 0, 0.5);
+  margin: 0px;
+  padding: 0px;
+}
+nav.horizontal-scroll-menu ul li {
+  display: inline;
+  float: left;
+  margin: 0px;
+}
+nav.horizontal-scroll-menu ul li a {
+  cursor: pointer;
+  display: block;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+  border-bottom: 2px solid black;
+}
+@media only screen and (min-width: 481px) {
+  nav.horizontal-scroll-menu ul li a {
+    padding: 0.6rem 1.2rem;
+  }
+}
+@media only screen and (min-width: 769px) {
+  nav.horizontal-scroll-menu ul li a {
+    padding: 0.7rem 1.4rem;
+  }
+}
+@media only screen and (min-width: 1025px) {
+  nav.horizontal-scroll-menu ul li a {
+    padding: 0.8rem 1.6rem;
+  }
+}
+nav.horizontal-scroll-menu ul li a.active {
+  background-color: black;
+  border-bottom: 2px solid white;
 }

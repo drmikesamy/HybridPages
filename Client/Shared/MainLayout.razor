@@ -1,3 +1,39 @@
-﻿@inherits LayoutComponentBase
+﻿@using HybridPages.Client.State;
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@inherits LayoutComponentBase
+@inject NavigationManager Navigation
+@inject PageService _pageService
 
-@Body
+<nav class="primary-nav">
+	<div class="primary-nav-left">
+		<h1>@_pageService.Page?.Title</h1>
+	</div>
+	<div class="primary-nav-right">
+		<nav class="horizontal-scroll-menu">
+			<ul>
+				<AuthorizeView>
+					<Authorized>
+						<li><NavLink Match="NavLinkMatch.All" href="settings">Page Settings</NavLink></li>
+						<li><NavLink Match="NavLinkMatch.All" href="" @onclick="BeginLogOut">Log Out</NavLink></li>
+					</Authorized>
+					<NotAuthorized>
+						<li><NavLink Match="NavLinkMatch.All" href="authentication/register">Register</NavLink></li>
+						<li><NavLink Match="NavLinkMatch.All" href="authentication/login">Log in</NavLink></li>
+					</NotAuthorized>
+				</AuthorizeView>
+			</ul>
+		</nav>
+		<LoginDisplay />
+	</div>
+</nav>
+<div class="content-container">
+	@Body
+</div>
+
+@code {
+	private void BeginLogOut()
+	{
+		Navigation.NavigateToLogout("authentication/logout");
+	}
+}

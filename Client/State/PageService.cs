@@ -38,7 +38,7 @@ namespace HybridPages.Client.State
 
 			newPost.Id = postId;
 
-			Page.Posts.AddLast(newPost);
+			Page.Posts.AddAfter(ListManipulation.FindById(Page.Posts, SelectedPost.Id), newPost);
 
 			SelectedPost = newPost;
 			NotifyStateChanged();
@@ -46,6 +46,11 @@ namespace HybridPages.Client.State
 		public void SelectPost(Post post)
 		{
 			SelectedPost = post;
+			NotifyStateChanged();
+		}
+		public void SetPostType(PostTypeEnum postType)
+		{
+			SelectedPost.Type = postType;
 			NotifyStateChanged();
 		}
 		public void MoveUp()

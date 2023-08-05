@@ -63,15 +63,23 @@
 }
 
 //section editor
-.section-editor{
-    background-color: black;
+.section-editor {
+    background-color: rgba(0,0,0,0.2);
+
+    article {
+        background-color: rgba(0,0,0,0.2);
+    }
 }
+
 
 .mouseover-border{
     border: 1px solid rgba(0,0,0,0);
 }
 .mouseover-border:hover {
     border: 1px dotted $black;
+}
+.editing-border {
+
 }
 
 //background designer

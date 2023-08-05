@@ -8,3 +8,34 @@ nav.primary-nav {
     grid-template-columns: auto auto;
     text-transform: capitalize;
 }
+nav.horizontal-scroll-menu {
+    background-color: rgba(0,0,0,0.2);
+
+    ul {
+        background-color: rgba(0,0,0,0.5);
+        margin: 0px;
+        padding: 0px;
+
+        li {
+            display: inline;
+            float: left;
+            margin: 0px;
+
+            a {
+                cursor: pointer;
+                display: block;
+                @include responsive-navlink-padding;
+                text-decoration: none;
+                color: white;
+                font-weight: bold;
+                border-bottom: 2px solid black;
+            }
+
+            a.active {
+                background-color: black;
+                border-bottom: 2px solid white;
+            }
+        }
+    }
+}
+
