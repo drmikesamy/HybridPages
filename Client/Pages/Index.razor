@@ -1,7 +1,5 @@
 ﻿@page "/"
 @page "/{UniqueName}"
-@page "/{UniqueName}/settings"
-@page "/{UniqueName}/settings/backgrounddesigner"
 @using System.Text.RegularExpressions;
 @using HybridPages.Client.Shared.EditorComponents
 @using HybridPages.Client.Shared.LayoutComponents
@@ -17,24 +15,22 @@
 @inject NavigationManager NavManager
 @inject PageService _pageService
 
-@if (_showBackgroundDesigner == true)
-{
-	<BackgroundDesigner></BackgroundDesigner>
-}
 <div class="background-container" style="@_backgroundMeshCss">
-	@if (_pageService.Page == null)
-	{
-		<article class="card">
-			<p><em>Loading...</em></p>
-		</article>
-	}
-	else
-	{
-		@foreach (var post in _pageService.Page.Posts)
+	<div class="content-container">
+		@if (_pageService.Page == null)
 		{
-			<ContentSection post="@post"></ContentSection>
+			<article class="card">
+				<p><em>Loading...</em></p>
+			</article>
 		}
-	}
+		else
+		{
+			@foreach (var post in _pageService.Page.Posts)
+			{
+				<ContentSection post="@post"></ContentSection>
+			}
+		}
+	</div>
 </div>
 
 @*@(JsonSerializer.Serialize(_pageService.Page, new JsonSerializerOptions() { WriteIndented = true }))*@
@@ -52,8 +48,6 @@
 		{
 			try
 			{
-				await _pageService.Get(UniqueName);
-
 				if (_pageService.Page != null)
 				{
 					if (_pageService.Page?.Style?.BackgroundType == BackgroundTypeEnum.Mesh && _pageService.Page?.Style?.BackgroundMesh != null)

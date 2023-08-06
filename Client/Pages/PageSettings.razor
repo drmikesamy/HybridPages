@@ -1,0 +1,12 @@
+﻿@page "/{UniqueName}/settings"
+@using HybridPages.Client.State;
+@inject PageService _pageService
+	<div>
+		SETTINGS PAGE
+	<NavLink Match="NavLinkMatch.All" href="@(UniqueName+"/backgrounddesigner")">Page Settings</NavLink>
+	</div>
+
+@code {
+	[Parameter]
+	public string? UniqueName { get; set; }
+}

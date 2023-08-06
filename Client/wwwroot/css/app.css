@@ -130,12 +130,14 @@ body {
 }
 
 .background-container {
-  position: fixed;
+  /*    position: fixed;
   left: 0;
   right: 0;
   top: 0;
   bottom: 0;
-  z-index: -1;
+  z-index: -1;*/
+  background-attachment: fixed;
+  background-size: 100vw 100vh;
 }
 
 .content-container {
@@ -323,26 +325,12 @@ body {
 }
 
 nav.primary-nav {
-  padding: 1rem;
+  padding: 0rem 1rem;
   background-color: #000000;
   display: grid;
   grid-template-columns: auto auto;
   text-transform: capitalize;
-}
-@media only screen and (min-width: 481px) {
-  nav.primary-nav {
-    padding: 1.2rem;
-  }
-}
-@media only screen and (min-width: 769px) {
-  nav.primary-nav {
-    padding: 1.4rem;
-  }
-}
-@media only screen and (min-width: 1025px) {
-  nav.primary-nav {
-    padding: 1.6rem;
-  }
+  align-items: center;
 }
 nav.primary-nav h1 {
   color: white;

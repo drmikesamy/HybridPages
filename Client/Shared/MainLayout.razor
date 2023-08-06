@@ -14,7 +14,7 @@
 			<ul>
 				<AuthorizeView>
 					<Authorized>
-						<li><NavLink Match="NavLinkMatch.All" href="settings">Page Settings</NavLink></li>
+						<li><NavLink Match="NavLinkMatch.All" href="@(UniqueName+"/settings")">Page Settings</NavLink></li>
 						<li><NavLink Match="NavLinkMatch.All" href="" @onclick="BeginLogOut">Log Out</NavLink></li>
 					</Authorized>
 					<NotAuthorized>
@@ -27,11 +27,21 @@
 		<LoginDisplay />
 	</div>
 </nav>
-<div class="content-container">
-	@Body
-</div>
+@Body
 
 @code {
+	public string? UniqueName { get; set; }
+
+	protected override async void OnParametersSet()
+	{
+		object uniqueName = null;
+		if ((this.Body.Target as RouteView)?.RouteData.RouteValues?.TryGetValue("UniqueName", out uniqueName) == true)
+		{
+			UniqueName = uniqueName?.ToString();
+			await _pageService.Get(UniqueName);
+		}
+	}
+
 	private void BeginLogOut()
 	{
 		Navigation.NavigateToLogout("authentication/logout");

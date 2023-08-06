@@ -1,12 +1,15 @@
 nav.primary-nav {
-    @include responsive-content-padding;
+    padding: 0rem 1rem;
     background-color: $black;
+
     h1 {
         color: white;
     }
+
     display: grid;
     grid-template-columns: auto auto;
     text-transform: capitalize;
+    align-items: center;
 }
 nav.horizontal-scroll-menu {
     background-color: rgba(0,0,0,0.2);

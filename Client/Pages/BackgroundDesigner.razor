@@ -1,4 +1,6 @@
-﻿@using HybridPages.Client.State;
+﻿@page "/{UniqueName}/backgrounddesigner"
+
+@using HybridPages.Client.State;
 @using HybridPages.Shared.Helpers;
 @using HybridPages.Shared.Models.Styling;
 @using HybridPages.Shared.Models;
@@ -81,6 +83,8 @@
 </div>
 
 @code {
+	[Parameter]
+	public string? UniqueName { get; set; }
 	private WindowDimensions windowDimensions = new WindowDimensions { Height = 0, Width = 0 };
 	private string backgroundCss = "";
 	private ColourPoint? _colourPoint;
