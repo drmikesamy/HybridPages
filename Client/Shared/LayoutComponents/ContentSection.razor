@@ -1,6 +1,7 @@
 ﻿@using HybridPages.Client.Shared.EditorComponents
 @using HybridPages.Client.State;
 @using HybridPages.Shared.Enums;
+@using HybridPages.Shared.Helpers;
 @using HybridPages.Shared.Models;
 @inject PageService _pageService;
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -16,9 +17,15 @@
 					<h5>@(post.Content != null && post.Content != "" ? post.Content : "Content")</h5>
 				</article>
 				break;
+			case PostTypeEnum.Vimeo:
+			case PostTypeEnum.YouTube:
+				<article class="card">
+				@ParseEmbeds.ParseVideoUrl(post.Content)
+				</article>
+				break;
 			default:
 				<article class="card">
-					@post.Content
+					@ParseEmbeds.ParseLongformContent(post.ContentTextLines)
 				</article>
 				break;
 		}

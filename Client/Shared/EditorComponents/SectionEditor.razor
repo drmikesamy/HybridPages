@@ -25,11 +25,24 @@
 							<input type="text" @bind-value="Title" @bind-value:event="oninput" />
 							<input type="text" @bind-value="Content" @bind-value:event="oninput" />
 							break;
-						default:
+						case PostTypeEnum.Image:
+							<input type="text" @bind-value="Title" @bind-value:event="oninput" />
 							<input type="text" @bind-value="Content" @bind-value:event="oninput" />
+							break;
+						case PostTypeEnum.Vimeo:
+						case PostTypeEnum.YouTube:
+							<div>URL:</div>
+							<input type="text" @bind-value="Content" @bind-value:event="oninput" />
+							break;
+						default:
+							@for(var i = 0; i < _pageService.SelectedPost.ContentTextLines.Count(); i++)
+							{
+								<RecursiveLongFormEditor TextLine="_pageService.SelectedPost.ContentTextLines.ElementAt(i)"></RecursiveLongFormEditor>
+							}
 							break;
 					}
 
+					<hr>
 					
 					@if (_pageService.SelectedPost?.Id != _pageService.Page?.Posts?.First?.Value.Id)
 					{

@@ -1,4 +1,6 @@
 ﻿using HybridPages.Shared.Enums;
+using HybridPages.Shared.Models.TextEditor;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HybridPages.Shared.Models
 {
@@ -10,9 +12,13 @@ namespace HybridPages.Shared.Models
 		public PostTypeEnum Type { get; set; } = PostTypeEnum.Text;
 		public Style? Style { get; set; }
 		public virtual ICollection<PostMeta> PostMeta { get; set; }
+		[NotMapped]
+		public List<TextLine> ContentTextLines { get; set; }
 		public Post()
 		{
 			PostMeta = new HashSet<PostMeta>();
+			ContentTextLines = new List<TextLine>();
+			ContentTextLines.Add(new TextLine());
 		}
 	}
 }

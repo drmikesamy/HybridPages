@@ -1,6 +1,7 @@
 ﻿using HybridPages.Shared.Enums;
 using HybridPages.Shared.Helpers;
 using HybridPages.Shared.Models;
+using HybridPages.Shared.Models.TextEditor;
 using System.Net.Http.Json;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Net.WebRequestMethods;
@@ -15,6 +16,7 @@ namespace HybridPages.Client.State
 		}
 		public Page? Page { get; set; }
 		public Post? SelectedPost { get; set; }
+		public TextLine? SelectedTextLine { get; set; }
 
 		public event Action OnStateChange;
 		public async Task Get(string uniqueName)
@@ -46,6 +48,11 @@ namespace HybridPages.Client.State
 		public void SelectPost(Post post)
 		{
 			SelectedPost = post;
+			NotifyStateChanged();
+		}
+		public void SelectTextLine(TextLine textLine)
+		{
+			SelectedTextLine = textLine;
 			NotifyStateChanged();
 		}
 		public void SetPostType(PostTypeEnum postType)

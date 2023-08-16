@@ -1,4 +1,6 @@
 ﻿@using HybridPages.Client.State;
+@using HybridPages.Shared.Enums;
+@using HybridPages.Shared.Helpers;
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @inherits LayoutComponentBase
@@ -7,7 +9,7 @@
 
 <nav class="primary-nav">
 	<div class="primary-nav-left">
-		<h1>@_pageService.Page?.Title</h1>
+		<h1>@UniqueName</h1>
 	</div>
 	<div class="primary-nav-right">
 		<nav class="horizontal-scroll-menu">
@@ -27,10 +29,13 @@
 		<LoginDisplay />
 	</div>
 </nav>
-@Body
+<div class="background-container" style="@_backgroundMeshCss">
+	@Body
+</div>
 
 @code {
 	public string? UniqueName { get; set; }
+	private string _backgroundMeshCss { get; set; } = string.Empty;
 
 	protected override async void OnParametersSet()
 	{
@@ -38,7 +43,11 @@
 		if ((this.Body.Target as RouteView)?.RouteData.RouteValues?.TryGetValue("UniqueName", out uniqueName) == true)
 		{
 			UniqueName = uniqueName?.ToString();
-			await _pageService.Get(UniqueName);
+			if (_pageService.Page != null)
+			{
+				if (_pageService.Page?.Style?.BackgroundType == BackgroundTypeEnum.Mesh && _pageService.Page?.Style?.BackgroundMesh != null)
+					_backgroundMeshCss = BackgroundMeshToCss.GetBackgroundMeshCss(_pageService.Page.Style.BackgroundMesh);
+			}
 		}
 	}
 

@@ -1,0 +1,166 @@
+﻿@using HybridPages.Client.State;
+@using HybridPages.Shared.Enums;
+@using HybridPages.Shared.Models.TextEditor;
+@using System.Text.RegularExpressions;
+@inject PageService _pageService;
+@page "/richtexteditor"
+
+<div tabindex="0" style="background-color: white" @onkeydown="KeyDown" @ref="inputBoxRef" class="rich-text-editor-container" @onmousedown:preventDefault @onmouseup="SelectionEnd" @onpointerleave="SelectionEnd" @onmouseup:preventDefault>
+	@{
+		loopIndex = 0;
+	}
+	@foreach (var character in ContentArray)
+	{
+		int i = loopIndex;
+		<span class="text-cursor-shift @((selectionStart <= i && i <= selectionEnd) || (selectionEnd <= i && i <= selectionStart) ? "selection-highlight" : "")" @onclick="() => MoveCursor(i)" @onmousedown="() => SelectionStart(i)" @onmouseenter="(e) => SelectionAdd(i, e)" @onmouseup="SelectionEnd" @onmousedown:preventDefault @onmouseup:preventDefault>
+			@character
+		</span>
+		@if (i == _cursorIndex)
+		{
+			<div class="text-cursor"></div>
+		}
+		loopIndex++;
+	}
+</div>
+@_cursorIndex
+@foreach (var entry in log)
+{
+	<p>@entry</p>
+}
+
+
+@code {
+	public string Content { get; set; } = "Testing123";
+	public List<string> ContentArray { get; set; }
+	private int _cursorIndex { get; set; }
+	private List<string> log { get; set; } = new();
+	public int loopIndex { get; set; }
+	private ElementReference inputBoxRef { get; set; }
+	private int? selectionStart { get; set; }
+	private int? selectionEnd { get; set; }
+	private bool isMouseDown { get; set; } = false;
+
+	private string _alphaNumericCharacterPattern = "^[a-zA-Z0-9]$";
+
+	protected override async Task OnInitializedAsync()
+	{
+		ContentArray = Content.ToCharArray().Select(i => i.ToString()).ToList();
+		_cursorIndex = ContentArray.Count() - 1;
+	}
+
+	private async Task SelectionStart(int index)
+	{
+		isMouseDown = true;
+		await inputBoxRef.FocusAsync();
+		selectionStart = index;
+		log.Add($"selection started: {index}");
+		StateHasChanged();
+	}
+	private async Task SelectionAdd(int index, MouseEventArgs e)
+	{
+		if(selectionStart != null && isMouseDown)
+		{
+			selectionEnd = index;
+			log.Add($"selection to: {index}");
+			if(selectionStart.Value < selectionEnd.Value)
+			{
+				MoveCursor(index);
+			}
+			else
+			{
+				MoveCursor(index - 1);
+			}
+			StateHasChanged();
+		}
+	}
+
+	private async Task SelectionEnd()
+	{
+		if (selectionStart == selectionEnd)
+		{
+			selectionStart = selectionEnd = null;
+		}
+		isMouseDown = false;
+		await inputBoxRef.FocusAsync();
+		log.Add($"selection ended: {selectionStart} -> {selectionEnd}");
+		StateHasChanged();
+	}
+
+	private async Task KeyDown(KeyboardEventArgs e)
+	{
+		//log.Add(e.Key);
+		bool deleted;
+		switch (true)
+		{
+			case bool _ when Regex.IsMatch(e.Key, _alphaNumericCharacterPattern):
+				ContentArray.Insert(_cursorIndex + 1, e.Key);
+				_cursorIndex++;
+				break;
+			case bool _ when e.Key == " ":
+				deleted = DeleteSelection();
+				ContentArray.Insert(_cursorIndex + 1, e.Key);
+				_cursorIndex++; 
+				break;
+			case bool _ when e.Key == "Enter":
+
+				break;
+			case bool _ when e.Key == "Backspace":
+				deleted = DeleteSelection();
+				if (!deleted && _cursorIndex >= 0)
+				{
+					ContentArray.RemoveAt(_cursorIndex);
+					_cursorIndex--;
+				}
+				break;
+			case bool _ when e.Key == "Delete":
+				deleted = DeleteSelection();
+				if (!deleted && _cursorIndex < ContentArray.Count() - 1)
+				{
+					ContentArray.RemoveAt(_cursorIndex + 1);
+				}
+				break;
+			case bool _ when e.Key == "ArrowLeft":
+				if(_cursorIndex >= 0)
+					_cursorIndex--;
+				break;
+			case bool _ when e.Key == "ArrowRight":
+				if (_cursorIndex < ContentArray.Count()-1)
+					_cursorIndex++;
+				break;
+			default:
+
+				break;
+		}
+		StateHasChanged();
+	}
+
+	private bool DeleteSelection()
+	{
+		if (selectionStart != null && selectionEnd != null)
+		{
+			if (selectionStart < selectionEnd)
+			{
+				var selectionCount = selectionEnd - selectionStart + 1;
+				ContentArray.RemoveRange(selectionStart.Value, selectionCount.Value);
+				MoveCursor(selectionStart.Value - 1);
+			}
+			else
+			{
+				var selectionCount = selectionStart - selectionEnd + 1;
+				ContentArray.RemoveRange(selectionEnd.Value, selectionCount.Value);
+				MoveCursor(selectionEnd.Value);
+			}
+			selectionStart = selectionEnd = null;
+			return true;
+		}
+		return false;
+	}
+
+	private async void MoveCursor(int index)
+	{
+		await inputBoxRef.FocusAsync();
+		_cursorIndex = index;
+		//log.Add($"index selected: {index}");
+		StateHasChanged();
+	}
+}
