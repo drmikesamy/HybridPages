@@ -4,7 +4,9 @@
 @using System.Text.RegularExpressions;
 @inject PageService _pageService;
 @page "/richtexteditor"
-
+<button @onclick="@(() => FormatItem("b"))">B</button>
+<button @onclick="@(() => FormatItem("i"))"><i>I</i></button>
+<button @onclick="@(() => FormatItem("u"))"><u>U</u></button>
 <div tabindex="0" style="background-color: white" @onkeydown="KeyDown" @ref="inputBoxRef" class="rich-text-editor-container" @onmousedown:preventDefault @onmouseup="SelectionEnd" @onpointerleave="SelectionEnd" @onmouseup:preventDefault>
 	@{
 		loopIndex = 0;
@@ -12,9 +14,17 @@
 	@foreach (var character in ContentArray)
 	{
 		int i = loopIndex;
-		<span class="text-cursor-shift @((selectionStart <= i && i <= selectionEnd) || (selectionEnd <= i && i <= selectionStart) ? "selection-highlight" : "")" @onclick="() => MoveCursor(i)" @onmousedown="() => SelectionStart(i)" @onmouseenter="(e) => SelectionAdd(i, e)" @onmouseup="SelectionEnd" @onmousedown:preventDefault @onmouseup:preventDefault>
-			@character
-		</span>
+		@if (Regex.IsMatch(character, @"<[^>]*>"))
+		{
+			
+		}
+		else
+		{
+			<span class="text-cursor-shift @((selectionStart <= i && i <= selectionEnd) || (selectionEnd <= i && i <= selectionStart) ? "selection-highlight" : "")" @onclick="() => MoveCursor(i)" @onmousedown="() => SelectionStart(i)" @onmouseenter="(e) => SelectionAdd(i, e)" @onmouseup="SelectionEnd" @onmousedown:preventDefault @onmouseup:preventDefault>
+				@character
+			</span>
+		}
+
 		@if (i == _cursorIndex)
 		{
 			<div class="text-cursor"></div>
@@ -22,16 +32,17 @@
 		loopIndex++;
 	}
 </div>
-@_cursorIndex
+@*@_cursorIndex
 @foreach (var entry in log)
 {
 	<p>@entry</p>
-}
+}*@
 
 
 @code {
 	public string Content { get; set; } = "Testing123";
 	public List<string> ContentArray { get; set; }
+	public List<FormatBlock> FormatBlocks { get; set; } = new List<FormatBlock>();
 	private int _cursorIndex { get; set; }
 	private List<string> log { get; set; } = new();
 	public int loopIndex { get; set; }
@@ -48,8 +59,23 @@
 		_cursorIndex = ContentArray.Count() - 1;
 	}
 
+	private void FormatItem(string format)
+	{
+		if (selectionStart != null && selectionEnd != null)
+		{
+			var lowerValue = Math.Min(selectionStart.Value, selectionEnd.Value);
+			var higherValue = Math.Max(selectionStart.Value, selectionEnd.Value);
+			ContentArray.Insert(lowerValue, $"<{format}>");
+			ContentArray.Insert(higherValue + 2, $"</{format}>");
+			selectionStart = lowerValue;
+			selectionEnd = higherValue + 2;
+			MoveCursor(selectionEnd.Value);
+		}
+	}
+
 	private async Task SelectionStart(int index)
 	{
+		selectionEnd = null;
 		isMouseDown = true;
 		await inputBoxRef.FocusAsync();
 		selectionStart = index;
@@ -58,11 +84,11 @@
 	}
 	private async Task SelectionAdd(int index, MouseEventArgs e)
 	{
-		if(selectionStart != null && isMouseDown)
+		if (selectionStart != null && isMouseDown)
 		{
 			selectionEnd = index;
 			log.Add($"selection to: {index}");
-			if(selectionStart.Value < selectionEnd.Value)
+			if (selectionStart.Value < selectionEnd.Value)
 			{
 				MoveCursor(index);
 			}
@@ -99,7 +125,7 @@
 			case bool _ when e.Key == " ":
 				deleted = DeleteSelection();
 				ContentArray.Insert(_cursorIndex + 1, e.Key);
-				_cursorIndex++; 
+				_cursorIndex++;
 				break;
 			case bool _ when e.Key == "Enter":
 
@@ -120,17 +146,18 @@
 				}
 				break;
 			case bool _ when e.Key == "ArrowLeft":
-				if(_cursorIndex >= 0)
+				if (_cursorIndex >= 0)
 					_cursorIndex--;
 				break;
 			case bool _ when e.Key == "ArrowRight":
-				if (_cursorIndex < ContentArray.Count()-1)
+				if (_cursorIndex < ContentArray.Count() - 1)
 					_cursorIndex++;
 				break;
 			default:
 
 				break;
 		}
+		selectionStart = selectionEnd = null;
 		StateHasChanged();
 	}
 
@@ -138,18 +165,11 @@
 	{
 		if (selectionStart != null && selectionEnd != null)
 		{
-			if (selectionStart < selectionEnd)
-			{
-				var selectionCount = selectionEnd - selectionStart + 1;
-				ContentArray.RemoveRange(selectionStart.Value, selectionCount.Value);
-				MoveCursor(selectionStart.Value - 1);
-			}
-			else
-			{
-				var selectionCount = selectionStart - selectionEnd + 1;
-				ContentArray.RemoveRange(selectionEnd.Value, selectionCount.Value);
-				MoveCursor(selectionEnd.Value);
-			}
+			var selectionCount = selectionEnd - selectionStart + 1;
+			var lowerValue = Math.Min(selectionStart.Value, selectionEnd.Value);
+			var higherValue = Math.Max(selectionStart.Value, selectionEnd.Value);
+			ContentArray.RemoveRange(lowerValue, selectionCount.Value);
+			MoveCursor(lowerValue - 1);
 			selectionStart = selectionEnd = null;
 			return true;
 		}

@@ -8,4 +8,10 @@ namespace HybridPages.Shared.Models.TextEditor
 		public List<TextLine> ChildTextLines { get; set; } = new List<TextLine>();
 		public TextLineTypeEnum TextLineType { get; set; } = TextLineTypeEnum.P;
 	}
+	public class FormatBlock
+	{
+		public List<string> ContentArray { get; set; } = new List<string>();
+		public List<FormatBlock> FormatBlocks { get; set; } = new List<FormatBlock>();
+		public string Tag { get; set; }
+	}
 }
