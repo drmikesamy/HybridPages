@@ -9,6 +9,14 @@
 <button @onclick="@(() => FormatItem("u"))"><u>U</u></button>
 <div tabindex="0" style="background-color: white" @onkeydown="KeyDown" @ref="inputBoxRef" class="rich-text-editor-container" @onmousedown:preventDefault @onmouseup="SelectionEnd" @onpointerleave="SelectionEnd" @onmouseup:preventDefault>
 	@{
+		formatBlockIndex = 0;
+	}
+	@foreach (var formatBlock in FormatBlocks)
+	{
+
+		formatBlockIndex++;
+	}
+	@{
 		loopIndex = 0;
 	}
 	@foreach (var character in ContentArray)
@@ -46,6 +54,7 @@
 	private int _cursorIndex { get; set; }
 	private List<string> log { get; set; } = new();
 	public int loopIndex { get; set; }
+	public int formatBlockIndex { get; set; }
 	private ElementReference inputBoxRef { get; set; }
 	private int? selectionStart { get; set; }
 	private int? selectionEnd { get; set; }
