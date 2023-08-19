@@ -4,34 +4,45 @@
 @using System.Text.RegularExpressions;
 @inject PageService _pageService;
 @page "/richtexteditor"
-<button @onclick="@(() => FormatItem("b"))">B</button>
-<button @onclick="@(() => FormatItem("i"))"><i>I</i></button>
-<button @onclick="@(() => FormatItem("u"))"><u>U</u></button>
+<button @onclick="@(() => FormatItem(FormatBlockTypeEnum.B))">B</button>
+<button @onclick="@(() => FormatItem(FormatBlockTypeEnum.I))"><i>I</i></button>
+<button @onclick="@(() => FormatItem(FormatBlockTypeEnum.U))"><u>U</u></button>
 <div tabindex="0" style="background-color: white" @onkeydown="KeyDown" @ref="inputBoxRef" class="rich-text-editor-container" @onmousedown:preventDefault @onmouseup="SelectionEnd" @onpointerleave="SelectionEnd" @onmouseup:preventDefault>
-	@{
-		formatBlockIndex = 0;
-	}
-	@foreach (var formatBlock in FormatBlocks)
-	{
-
-		formatBlockIndex++;
-	}
 	@{
 		loopIndex = 0;
 	}
 	@foreach (var character in ContentArray)
 	{
 		int i = loopIndex;
-		@if (Regex.IsMatch(character, @"<[^>]*>"))
-		{
-			
-		}
-		else
-		{
-			<span class="text-cursor-shift @((selectionStart <= i && i <= selectionEnd) || (selectionEnd <= i && i <= selectionStart) ? "selection-highlight" : "")" @onclick="() => MoveCursor(i)" @onmousedown="() => SelectionStart(i)" @onmouseenter="(e) => SelectionAdd(i, e)" @onmouseup="SelectionEnd" @onmousedown:preventDefault @onmouseup:preventDefault>
-				@character
-			</span>
-		}
+		<span class="text-cursor-shift @((selectionStart <= i && i <= selectionEnd) || (selectionEnd <= i && i <= selectionStart) ? "selection-highlight" : "")" @onclick="() => MoveCursor(i)" @onmousedown="() => SelectionStart(i)" @onmouseenter="(e) => SelectionAdd(i, e)" @onmouseup="SelectionEnd" @onmousedown:preventDefault @onmouseup:preventDefault>
+			@switch (character.Format)
+			{
+				case FormatBlockTypeEnum.None:
+					@character.Content
+					break;
+				case FormatBlockTypeEnum.I:
+					<i>@character.Content</i>
+					break;
+				case FormatBlockTypeEnum.B:
+					<b>@character.Content</b>
+					break;
+				case FormatBlockTypeEnum.U:
+					<u>@character.Content</u>
+					break;
+				case FormatBlockTypeEnum.I | FormatBlockTypeEnum.U:
+					<i><u>@character.Content</u></i>
+					break;
+				case FormatBlockTypeEnum.B | FormatBlockTypeEnum.U:
+					<b><u>@character.Content</u></b>
+					break;
+				case FormatBlockTypeEnum.I | FormatBlockTypeEnum.B:
+					<i><b>@character.Content</b></i>
+					break;
+				case FormatBlockTypeEnum.I | FormatBlockTypeEnum.B | FormatBlockTypeEnum.U:
+					<i><b><u>@character.Content</u></b></i>
+					break;
+			}
+		</span>
 
 		@if (i == _cursorIndex)
 		{
@@ -49,8 +60,8 @@
 
 @code {
 	public string Content { get; set; } = "Testing123";
-	public List<string> ContentArray { get; set; }
-	public List<FormatBlock> FormatBlocks { get; set; } = new List<FormatBlock>();
+	public List<List<FormatBlock>> Paragraphs { get; set; } = new List<List<FormatBlock>>();
+	public List<FormatBlock> ContentArray { get; set; }
 	private int _cursorIndex { get; set; }
 	private List<string> log { get; set; } = new();
 	public int loopIndex { get; set; }
@@ -60,25 +71,33 @@
 	private int? selectionEnd { get; set; }
 	private bool isMouseDown { get; set; } = false;
 
-	private string _alphaNumericCharacterPattern = "^[a-zA-Z0-9]$";
+	private string _alphaNumericCharacterPattern = "^[a-zA-Z0-9.,@£$%!?&*^()\\[\\]\\/{} ]$";
 
 	protected override async Task OnInitializedAsync()
 	{
-		ContentArray = Content.ToCharArray().Select(i => i.ToString()).ToList();
+		ContentArray = Content.ToCharArray().Select(i => new FormatBlock { Content = i.ToString() }).ToList();
 		_cursorIndex = ContentArray.Count() - 1;
 	}
 
-	private void FormatItem(string format)
+	private void FormatItem(FormatBlockTypeEnum formatFlag)
 	{
 		if (selectionStart != null && selectionEnd != null)
 		{
 			var lowerValue = Math.Min(selectionStart.Value, selectionEnd.Value);
 			var higherValue = Math.Max(selectionStart.Value, selectionEnd.Value);
-			ContentArray.Insert(lowerValue, $"<{format}>");
-			ContentArray.Insert(higherValue + 2, $"</{format}>");
-			selectionStart = lowerValue;
-			selectionEnd = higherValue + 2;
-			MoveCursor(selectionEnd.Value);
+			var selectionCount = higherValue - lowerValue + 1;
+			foreach(var formatBlock in ContentArray.GetRange(lowerValue, selectionCount))
+			{
+				if ((formatBlock.Format & formatFlag) != 0)
+				{
+					formatBlock.Format &= ~formatFlag;
+				}
+				else
+				{
+					formatBlock.Format |= formatFlag;
+				}
+			}
+			MoveCursor(higherValue);
 		}
 	}
 
@@ -111,10 +130,6 @@
 
 	private async Task SelectionEnd()
 	{
-		if (selectionStart == selectionEnd)
-		{
-			selectionStart = selectionEnd = null;
-		}
 		isMouseDown = false;
 		await inputBoxRef.FocusAsync();
 		log.Add($"selection ended: {selectionStart} -> {selectionEnd}");
@@ -128,12 +143,8 @@
 		switch (true)
 		{
 			case bool _ when Regex.IsMatch(e.Key, _alphaNumericCharacterPattern):
-				ContentArray.Insert(_cursorIndex + 1, e.Key);
-				_cursorIndex++;
-				break;
-			case bool _ when e.Key == " ":
 				deleted = DeleteSelection();
-				ContentArray.Insert(_cursorIndex + 1, e.Key);
+				ContentArray.Insert(_cursorIndex + 1, new FormatBlock { Content = e.Key });
 				_cursorIndex++;
 				break;
 			case bool _ when e.Key == "Enter":

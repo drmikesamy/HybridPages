@@ -10,8 +10,7 @@ namespace HybridPages.Shared.Models.TextEditor
 	}
 	public class FormatBlock
 	{
-		public List<string> ContentArray { get; set; } = new List<string>();
-		public List<FormatBlock> FormatBlocks { get; set; } = new List<FormatBlock>();
-		public string Tag { get; set; }
+		public string Content { get; set; } = "";
+		public FormatBlockTypeEnum Format { get; set; } = FormatBlockTypeEnum.None;
 	}
 }
