@@ -4,9 +4,9 @@
 @using System.Text.RegularExpressions;
 @inject PageService _pageService;
 @page "/richtexteditor"
-<button @onclick="@(() => FormatItem(FormatBlockTypeEnum.B))">B</button>
-<button @onclick="@(() => FormatItem(FormatBlockTypeEnum.I))"><i>I</i></button>
-<button @onclick="@(() => FormatItem(FormatBlockTypeEnum.U))"><u>U</u></button>
+<button class="@(SelectionFormatContains(FormatBlockTypeEnum.B) ? "format-button-selected" : "")" @onclick="@(() => FormatItem(FormatBlockTypeEnum.B))">B</button>
+<button class="@(SelectionFormatContains(FormatBlockTypeEnum.I) ? "format-button-selected" : "")" @onclick="@(() => FormatItem(FormatBlockTypeEnum.I))"><i>I</i></button>
+<button class="@(SelectionFormatContains(FormatBlockTypeEnum.U) ? "format-button-selected" : "")" @onclick="@(() => FormatItem(FormatBlockTypeEnum.U))"><u>U</u></button>
 <div tabindex="0" style="background-color: white" @onkeydown="KeyDown" @ref="inputBoxRef" class="rich-text-editor-container" @onmousedown:preventDefault @onmouseup="SelectionEnd" @onpointerleave="SelectionEnd" @onmouseup:preventDefault>
 	@{
 		loopIndex = 0;
@@ -79,6 +79,28 @@
 		_cursorIndex = ContentArray.Count() - 1;
 	}
 
+	private bool SelectionFormatContains(FormatBlockTypeEnum formatFlag)
+	{
+		int anchorValue;
+
+		if (selectionStart != null && selectionEnd != null)
+		{
+			anchorValue = Math.Min(selectionStart.Value, selectionEnd.Value);
+		}
+		else
+		{
+			anchorValue = _cursorIndex;
+		}
+		if ((ContentArray[anchorValue].Format & formatFlag) != 0)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 	private void FormatItem(FormatBlockTypeEnum formatFlag)
 	{
 		if (selectionStart != null && selectionEnd != null)
@@ -86,15 +108,30 @@
 			var lowerValue = Math.Min(selectionStart.Value, selectionEnd.Value);
 			var higherValue = Math.Max(selectionStart.Value, selectionEnd.Value);
 			var selectionCount = higherValue - lowerValue + 1;
-			foreach(var formatBlock in ContentArray.GetRange(lowerValue, selectionCount))
+
+			var flagAdded = false;
+			var flagRemoved = false;
+
+			if ((ContentArray[lowerValue].Format & formatFlag) == 0)
 			{
-				if ((formatBlock.Format & formatFlag) != 0)
-				{
-					formatBlock.Format &= ~formatFlag;
-				}
-				else
+				ContentArray[lowerValue].Format |= formatFlag;
+				flagAdded = true;
+			}
+			else
+			{
+				ContentArray[lowerValue].Format &= ~formatFlag;
+				flagRemoved = true;
+			}
+
+			foreach (var formatBlock in ContentArray.GetRange(lowerValue, selectionCount))
+			{
+				if ((formatBlock.Format & formatFlag) == 0 && flagAdded)
 				{
 					formatBlock.Format |= formatFlag;
+				}
+				else if ((formatBlock.Format & formatFlag) != 0 && flagRemoved)
+				{
+					formatBlock.Format &= ~formatFlag;
 				}
 			}
 			MoveCursor(higherValue);
@@ -138,14 +175,19 @@
 
 	private async Task KeyDown(KeyboardEventArgs e)
 	{
-		//log.Add(e.Key);
 		bool deleted;
 		switch (true)
 		{
 			case bool _ when Regex.IsMatch(e.Key, _alphaNumericCharacterPattern):
-				deleted = DeleteSelection();
+
 				ContentArray.Insert(_cursorIndex + 1, new FormatBlock { Content = e.Key });
 				_cursorIndex++;
+				if (selectionStart != null && selectionEnd != null)
+				{
+					selectionStart++;
+					selectionEnd++;
+					deleted = DeleteSelection();
+				}
 				break;
 			case bool _ when e.Key == "Enter":
 
@@ -185,10 +227,10 @@
 	{
 		if (selectionStart != null && selectionEnd != null)
 		{
-			var selectionCount = selectionEnd - selectionStart + 1;
 			var lowerValue = Math.Min(selectionStart.Value, selectionEnd.Value);
 			var higherValue = Math.Max(selectionStart.Value, selectionEnd.Value);
-			ContentArray.RemoveRange(lowerValue, selectionCount.Value);
+			var selectionCount = higherValue - lowerValue + 1;
+			ContentArray.RemoveRange(lowerValue, selectionCount);
 			MoveCursor(lowerValue - 1);
 			selectionStart = selectionEnd = null;
 			return true;

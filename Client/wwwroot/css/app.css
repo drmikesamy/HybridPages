@@ -386,6 +386,10 @@ body {
   background-color: greenyellow;
 }
 
+.format-button-selected {
+  background-color: grey;
+}
+
 nav.primary-nav {
   padding: 0rem 1rem;
   background-color: #000000;
