@@ -12,5 +12,11 @@ namespace HybridPages.Shared.Models.TextEditor
 	{
 		public string Content { get; set; } = "";
 		public FormatBlockTypeEnum Format { get; set; } = FormatBlockTypeEnum.None;
+		public bool IsSelected { get; set; } = false;
+	}
+	public class Block
+	{
+		public List<FormatBlock> FormatBlocks { get; set; } = new List<FormatBlock> { };
+		public TextLineTypeEnum BlockType { get; set; }
 	}
 }

@@ -2,25 +2,32 @@
     display: inline-block;
     width: 1px;
     margin-left: -1px;
-    height: 20px;
-    margin-bottom: -3px;
+    height: 1.3rem;
+    margin-bottom: -0.2rem;
     background-color: black;
-    animation: cursor-blink 1.5s steps(2) infinite;
+    animation: cursor-blink 1s steps(1) infinite;
+    opacity: 0;
 }
 
 .text-cursor-shift {
-    margin-left: -2px;
-    margin-right: 2px;
+
 }
 
 .rich-text-editor-container {
-    padding-left: 2px;
+    padding: 0.5rem;
     background-color: white;
 }
 
 @keyframes cursor-blink {
     0% {
+        opacity: 1;
+    }
+
+    50% {
         opacity: 0;
+    }
+    100% {
+        opacity: 1;
     }
 }
 
@@ -30,4 +37,13 @@
 
 .format-button-selected{
     background-color: grey;
+}
+
+p{
+    min-height: 2rem;
+}
+
+.text-line{
+    width: 100%;
+    cursor:text;
 }

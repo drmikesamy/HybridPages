@@ -9,66 +9,86 @@
 <button class="@(SelectionFormatContains(FormatBlockTypeEnum.U) ? "format-button-selected" : "")" @onclick="@(() => FormatItem(FormatBlockTypeEnum.U))"><u>U</u></button>
 <div tabindex="0" style="background-color: white" @onkeydown="KeyDown" @ref="inputBoxRef" class="rich-text-editor-container" @onmousedown:preventDefault @onmouseup="SelectionEnd" @onpointerleave="SelectionEnd" @onmouseup:preventDefault>
 	@{
-		loopIndex = 0;
+		blockIndex = 0;
 	}
-	@foreach (var character in ContentArray)
+	@foreach (var block in Blocks)
 	{
-		int i = loopIndex;
-		<span class="text-cursor-shift @((selectionStart <= i && i <= selectionEnd) || (selectionEnd <= i && i <= selectionStart) ? "selection-highlight" : "")" @onclick="() => MoveCursor(i)" @onmousedown="() => SelectionStart(i)" @onmouseenter="(e) => SelectionAdd(i, e)" @onmouseup="SelectionEnd" @onmousedown:preventDefault @onmouseup:preventDefault>
-			@switch (character.Format)
-			{
-				case FormatBlockTypeEnum.None:
-					@character.Content
-					break;
-				case FormatBlockTypeEnum.I:
-					<i>@character.Content</i>
-					break;
-				case FormatBlockTypeEnum.B:
-					<b>@character.Content</b>
-					break;
-				case FormatBlockTypeEnum.U:
-					<u>@character.Content</u>
-					break;
-				case FormatBlockTypeEnum.I | FormatBlockTypeEnum.U:
-					<i><u>@character.Content</u></i>
-					break;
-				case FormatBlockTypeEnum.B | FormatBlockTypeEnum.U:
-					<b><u>@character.Content</u></b>
-					break;
-				case FormatBlockTypeEnum.I | FormatBlockTypeEnum.B:
-					<i><b>@character.Content</b></i>
-					break;
-				case FormatBlockTypeEnum.I | FormatBlockTypeEnum.B | FormatBlockTypeEnum.U:
-					<i><b><u>@character.Content</u></b></i>
-					break;
-			}
-		</span>
+		int j = blockIndex;
 
-		@if (i == _cursorIndex)
-		{
-			<div class="text-cursor"></div>
-		}
-		loopIndex++;
+		<p class="text-line" @onclick="() => MoveCursor(j, block.FormatBlocks.Count()-1)">
+			@{
+				loopIndex = 0;
+			}
+
+			@foreach (var character in block.FormatBlocks)
+			{
+				int i = loopIndex;
+
+				<span class="text-cursor-shift @(character.IsSelected ? "selection-highlight" : "")" @onclick="() => MoveCursor(j, i)" @onclick:stopPropagation="true" @onmousedown="() => SelectionStart(j, i)" @onmouseenter="(e) => SelectionAdd(j, i, e)" @onmouseup="SelectionEnd" @onmousedown:preventDefault @onmouseup:preventDefault>
+					@switch (character.Format)
+					{
+						case FormatBlockTypeEnum.None:
+							@character.Content
+							break;
+						case FormatBlockTypeEnum.I:
+							<i>@character.Content</i>
+							break;
+						case FormatBlockTypeEnum.B:
+							<b>@character.Content</b>
+							break;
+						case FormatBlockTypeEnum.U:
+							<u>@character.Content</u>
+							break;
+						case FormatBlockTypeEnum.I | FormatBlockTypeEnum.U:
+							<i><u>@character.Content</u></i>
+							break;
+						case FormatBlockTypeEnum.B | FormatBlockTypeEnum.U:
+							<b><u>@character.Content</u></b>
+							break;
+						case FormatBlockTypeEnum.I | FormatBlockTypeEnum.B:
+							<i><b>@character.Content</b></i>
+							break;
+						case FormatBlockTypeEnum.I | FormatBlockTypeEnum.B | FormatBlockTypeEnum.U:
+							<i><b><u>@character.Content</u></b></i>
+							break;
+					}
+				</span>
+
+				@if (j == _cursorIndex.Item1 && i == _cursorIndex.Item2)
+				{
+					<div class="text-cursor"></div>
+				}
+
+				loopIndex++;
+			}
+			@if (j == _cursorIndex.Item1 && block.FormatBlocks.Count() == 0)
+			{
+				<div class="text-cursor"></div>
+			}
+		</p>
+		blockIndex++;
 	}
 </div>
-@*@_cursorIndex
+@_cursorIndex
 @foreach (var entry in log)
 {
 	<p>@entry</p>
-}*@
+}
 
 
 @code {
 	public string Content { get; set; } = "Testing123";
-	public List<List<FormatBlock>> Paragraphs { get; set; } = new List<List<FormatBlock>>();
+	public List<Block> Blocks { get; set; } = new List<Block>();
 	public List<FormatBlock> ContentArray { get; set; }
-	private int _cursorIndex { get; set; }
+	private Tuple<int, int> _cursorIndex { get; set; }
 	private List<string> log { get; set; } = new();
 	public int loopIndex { get; set; }
-	public int formatBlockIndex { get; set; }
+	public int blockIndex { get; set; }
 	private ElementReference inputBoxRef { get; set; }
-	private int? selectionStart { get; set; }
-	private int? selectionEnd { get; set; }
+	private Tuple<int, int>? selectionStart { get; set; }
+	private Tuple<int, int>? selectionEnd { get; set; }
+	private Tuple<int, int>? lowerValue { get; set; }
+	private Tuple<int, int>? higherValue { get; set; }
 	private bool isMouseDown { get; set; } = false;
 
 	private string _alphaNumericCharacterPattern = "^[a-zA-Z0-9.,@£$%!?&*^()\\[\\]\\/{} ]$";
@@ -76,90 +96,151 @@
 	protected override async Task OnInitializedAsync()
 	{
 		ContentArray = Content.ToCharArray().Select(i => new FormatBlock { Content = i.ToString() }).ToList();
-		_cursorIndex = ContentArray.Count() - 1;
+		Blocks.Add(new Block { FormatBlocks = ContentArray });
+		_cursorIndex = new Tuple<int, int>(0, ContentArray.Count() - 1);
+	}
+
+	private void AddBlock(int? index = null)
+	{
+		if (index != null)
+		{
+			Blocks.Insert(index.Value + 1, new Block());
+		}
+		else
+		{
+			Blocks.Add(new Block());
+		}
+
 	}
 
 	private bool SelectionFormatContains(FormatBlockTypeEnum formatFlag)
 	{
-		int anchorValue;
-
-		if (selectionStart != null && selectionEnd != null)
-		{
-			anchorValue = Math.Min(selectionStart.Value, selectionEnd.Value);
-		}
-		else
-		{
-			anchorValue = _cursorIndex;
-		}
-		if ((ContentArray[anchorValue].Format & formatFlag) != 0)
-		{
-			return true;
-		}
-		else
-		{
+		var firstSelectedBlock = Blocks.SelectMany(b => b.FormatBlocks).FirstOrDefault(f => f.IsSelected);
+		if (firstSelectedBlock == null)
 			return false;
-		}
+		return (firstSelectedBlock.Format & formatFlag) != 0;
 	}
 
 	private void FormatItem(FormatBlockTypeEnum formatFlag)
 	{
-		if (selectionStart != null && selectionEnd != null)
+		var selectedItems = Blocks.SelectMany(b => b.FormatBlocks.Where(fb => fb.IsSelected));
+		var itemCount = 0;
+		var flagAdded = false;
+		var flagRemoved = false;
+		foreach (var item in selectedItems)
 		{
-			var lowerValue = Math.Min(selectionStart.Value, selectionEnd.Value);
-			var higherValue = Math.Max(selectionStart.Value, selectionEnd.Value);
-			var selectionCount = higherValue - lowerValue + 1;
-
-			var flagAdded = false;
-			var flagRemoved = false;
-
-			if ((ContentArray[lowerValue].Format & formatFlag) == 0)
+			if (itemCount == 0)
 			{
-				ContentArray[lowerValue].Format |= formatFlag;
-				flagAdded = true;
+				if ((item.Format & formatFlag) == 0)
+				{
+					item.Format |= formatFlag;
+					flagAdded = true;
+				}
+				else
+				{
+					item.Format &= ~formatFlag;
+					flagRemoved = true;
+				}
 			}
 			else
 			{
-				ContentArray[lowerValue].Format &= ~formatFlag;
-				flagRemoved = true;
-			}
-
-			foreach (var formatBlock in ContentArray.GetRange(lowerValue, selectionCount))
-			{
-				if ((formatBlock.Format & formatFlag) == 0 && flagAdded)
+				if (flagAdded)
 				{
-					formatBlock.Format |= formatFlag;
+					item.Format |= formatFlag;
 				}
-				else if ((formatBlock.Format & formatFlag) != 0 && flagRemoved)
+				else if (flagRemoved)
 				{
-					formatBlock.Format &= ~formatFlag;
+					item.Format &= ~formatFlag;
 				}
 			}
-			MoveCursor(higherValue);
+			itemCount++;
 		}
+
 	}
 
-	private async Task SelectionStart(int index)
+	private async Task SelectionStart(int blockIndex, int index)
 	{
+		Blocks.ForEach(b => b.FormatBlocks.ForEach(f => f.IsSelected = false));
 		selectionEnd = null;
 		isMouseDown = true;
 		await inputBoxRef.FocusAsync();
-		selectionStart = index;
-		log.Add($"selection started: {index}");
+		selectionStart = new Tuple<int, int>(blockIndex, index);
 		StateHasChanged();
 	}
-	private async Task SelectionAdd(int index, MouseEventArgs e)
+	private async Task SelectionAdd(int blockIndex, int index, MouseEventArgs e)
 	{
 		if (selectionStart != null && isMouseDown)
 		{
-			selectionEnd = index;
-			log.Add($"selection to: {index}");
-			if (selectionStart.Value < selectionEnd.Value)
+			selectionEnd = new Tuple<int, int>(blockIndex, index);
+
+			if (selectionEnd.Item1 == selectionStart.Item1)
 			{
-				MoveCursor(index);
+				lowerValue = new Tuple<int, int>(selectionStart.Item1, Math.Min(selectionStart.Item2, selectionEnd.Item2));
+				higherValue = new Tuple<int, int>(selectionStart.Item1, Math.Max(selectionStart.Item2, selectionEnd.Item2));
+			}
+			else if (selectionEnd.Item1 > selectionStart.Item1)
+			{
+				lowerValue = new Tuple<int, int>(selectionStart.Item1, selectionStart.Item2);
+				higherValue = new Tuple<int, int>(selectionEnd.Item1, selectionEnd.Item2);
 			}
 			else
 			{
-				MoveCursor(index - 1);
+				lowerValue = new Tuple<int, int>(selectionEnd.Item1, selectionEnd.Item2);
+				higherValue = new Tuple<int, int>(selectionStart.Item1, selectionStart.Item2);
+			}
+
+			for (var i = lowerValue.Item1; i <= higherValue.Item1; i++)
+			{
+				if (i > lowerValue.Item1 && i < higherValue.Item1)
+				{
+					Blocks[i].FormatBlocks.ForEach(f => f.IsSelected = true);
+				}
+				else if (i == lowerValue.Item1 && i == higherValue.Item1)
+				{
+					for (var j = lowerValue.Item2; j <= higherValue.Item2; j++)
+					{
+						Blocks[i].FormatBlocks[j].IsSelected = true;
+					}
+					for (var j = 0; j < lowerValue.Item2; j++)
+					{
+						Blocks[i].FormatBlocks[j].IsSelected = false;
+					}
+					for (var j = higherValue.Item2 + 1; j < Blocks[i].FormatBlocks.Count(); j++)
+					{
+						Blocks[i].FormatBlocks[j].IsSelected = false;
+					}
+				}
+				else if (i == lowerValue.Item1 && lowerValue.Item1 != higherValue.Item1)
+				{
+					for (var j = lowerValue.Item2; j < Blocks[i].FormatBlocks.Count(); j++)
+					{
+						Blocks[i].FormatBlocks[j].IsSelected = true;
+					}
+					for (var j = 0; j < lowerValue.Item2; j++)
+					{
+						Blocks[i].FormatBlocks[j].IsSelected = false;
+					}
+				}
+				else if (i == higherValue.Item1)
+				{
+					for (var j = 0; j <= higherValue.Item2 + 1; j++)
+					{
+						Blocks[i].FormatBlocks[j].IsSelected = true;
+					}
+					for (var j = higherValue.Item2 + 1; j < Blocks[i].FormatBlocks.Count(); j++)
+					{
+						Blocks[i].FormatBlocks[j].IsSelected = false;
+					}
+				}
+			}
+
+			if ((selectionStart.Item1 == selectionEnd.Item1 && selectionStart.Item2 < selectionEnd.Item2) || selectionStart.Item1 < selectionEnd.Item1)
+			{
+				MoveCursor(selectionEnd.Item1, selectionEnd.Item2);
+			}
+			else
+			{
+				MoveCursor(selectionEnd.Item1, selectionEnd.Item2 - 1);
 			}
 			StateHasChanged();
 		}
@@ -167,9 +248,8 @@
 
 	private async Task SelectionEnd()
 	{
-		isMouseDown = false;
 		await inputBoxRef.FocusAsync();
-		log.Add($"selection ended: {selectionStart} -> {selectionEnd}");
+		isMouseDown = false;
 		StateHasChanged();
 	}
 
@@ -180,40 +260,61 @@
 		{
 			case bool _ when Regex.IsMatch(e.Key, _alphaNumericCharacterPattern):
 
-				ContentArray.Insert(_cursorIndex + 1, new FormatBlock { Content = e.Key });
-				_cursorIndex++;
+				Blocks[_cursorIndex.Item1].FormatBlocks.Insert(_cursorIndex.Item2 + 1, new FormatBlock { Content = e.Key });
+				_cursorIndex = new Tuple<int, int>(_cursorIndex.Item1, _cursorIndex.Item2 + 1);
 				if (selectionStart != null && selectionEnd != null)
 				{
-					selectionStart++;
-					selectionEnd++;
+					selectionStart = new Tuple<int, int>(selectionStart.Item1, selectionStart.Item2 + 1);
+					selectionEnd = new Tuple<int, int>(selectionEnd.Item1, selectionEnd.Item2 + 1);
 					deleted = DeleteSelection();
 				}
 				break;
 			case bool _ when e.Key == "Enter":
 
+				var blocksToMove = Blocks[_cursorIndex.Item1].FormatBlocks.Where(f => Blocks[_cursorIndex.Item1].FormatBlocks.IndexOf(f) > _cursorIndex.Item2);
+
+				if (_cursorIndex.Item1 < Blocks.Count())
+				{
+					AddBlock(_cursorIndex.Item1);
+				}
+				else
+				{
+					AddBlock();
+				}
+
+				Blocks[_cursorIndex.Item1 + 1].FormatBlocks.AddRange(blocksToMove);
+				Blocks[_cursorIndex.Item1].FormatBlocks.RemoveRange(_cursorIndex.Item2+1, blocksToMove.Count());
+
+				_cursorIndex = new Tuple<int, int>(_cursorIndex.Item1 + 1, -1);
 				break;
 			case bool _ when e.Key == "Backspace":
-				deleted = DeleteSelection();
-				if (!deleted && _cursorIndex >= 0)
+				//deleted = DeleteSelection();
+				if (_cursorIndex.Item1 >= 0 && _cursorIndex.Item2 >= 0)
 				{
-					ContentArray.RemoveAt(_cursorIndex);
-					_cursorIndex--;
+					Blocks[_cursorIndex.Item1].FormatBlocks.RemoveAt(_cursorIndex.Item2);
+					_cursorIndex = new Tuple<int, int>(_cursorIndex.Item1, _cursorIndex.Item2 - 1);
+				}
+				else if (_cursorIndex.Item1 > 0 && _cursorIndex.Item2 == -1)
+				{
+					var lastIndexOfPrevBlock = Blocks[_cursorIndex.Item1 - 1].FormatBlocks.Count() - 1;
+					Blocks.RemoveAt(_cursorIndex.Item1);
+					MoveCursor(_cursorIndex.Item1 - 1, lastIndexOfPrevBlock);
 				}
 				break;
 			case bool _ when e.Key == "Delete":
 				deleted = DeleteSelection();
-				if (!deleted && _cursorIndex < ContentArray.Count() - 1)
+				if (!deleted && _cursorIndex.Item2 < Blocks[_cursorIndex.Item1].FormatBlocks.Count() - 1)
 				{
-					ContentArray.RemoveAt(_cursorIndex + 1);
+					Blocks[_cursorIndex.Item1].FormatBlocks.RemoveAt(_cursorIndex.Item2 + 1);
 				}
 				break;
 			case bool _ when e.Key == "ArrowLeft":
-				if (_cursorIndex >= 0)
-					_cursorIndex--;
+				if (_cursorIndex.Item1 >= 0 && _cursorIndex.Item2 >= 0)
+					_cursorIndex = new Tuple<int, int>(_cursorIndex.Item1, _cursorIndex.Item2 - 1);
 				break;
 			case bool _ when e.Key == "ArrowRight":
-				if (_cursorIndex < ContentArray.Count() - 1)
-					_cursorIndex++;
+				if (_cursorIndex.Item2 < Blocks[_cursorIndex.Item1].FormatBlocks.Count() - 1)
+					_cursorIndex = new Tuple<int, int>(_cursorIndex.Item1, _cursorIndex.Item2 + 1);
 				break;
 			default:
 
@@ -225,24 +326,33 @@
 
 	private bool DeleteSelection()
 	{
-		if (selectionStart != null && selectionEnd != null)
+		var deleteSuccess = false;
+		foreach (var block in Blocks)
 		{
-			var lowerValue = Math.Min(selectionStart.Value, selectionEnd.Value);
-			var higherValue = Math.Max(selectionStart.Value, selectionEnd.Value);
-			var selectionCount = higherValue - lowerValue + 1;
-			ContentArray.RemoveRange(lowerValue, selectionCount);
-			MoveCursor(lowerValue - 1);
-			selectionStart = selectionEnd = null;
-			return true;
+			if (block.FormatBlocks.All(fb => fb.IsSelected))
+			{
+				var removed = Blocks.Remove(block);
+				if (removed)
+				{
+					deleteSuccess = true;
+				}
+			}
+			else
+			{
+				var removed = block.FormatBlocks.RemoveAll(fb => fb.IsSelected);
+				if (removed > 0)
+				{
+					deleteSuccess = true;
+				}
+			}
 		}
-		return false;
+		return deleteSuccess;
 	}
 
-	private async void MoveCursor(int index)
+	private async void MoveCursor(int blockIndex, int characterIndex)
 	{
 		await inputBoxRef.FocusAsync();
-		_cursorIndex = index;
-		//log.Add($"index selected: {index}");
+		_cursorIndex = new Tuple<int, int>(blockIndex, characterIndex);
 		StateHasChanged();
 	}
 }
