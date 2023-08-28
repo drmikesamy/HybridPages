@@ -171,6 +171,8 @@
 	{
 		if (selectionStart != null && isMouseDown)
 		{
+			if(selectionStart.Item1 == blockIndex)
+
 			selectionEnd = new Tuple<int, int>(blockIndex, index);
 
 			if (selectionEnd.Item1 == selectionStart.Item1)
