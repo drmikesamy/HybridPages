@@ -43,7 +43,9 @@ p{
     min-height: 2rem;
 }
 
-.text-line{
+.text-line {
     width: 100%;
-    cursor:text;
+    cursor: text;
+    display: grid;
+    grid-template-columns: max-content auto;
 }
