@@ -17,6 +17,6 @@ namespace HybridPages.Shared.Models.TextEditor
 	public class Block
 	{
 		public List<FormatBlock> FormatBlocks { get; set; } = new List<FormatBlock> { };
-		public TextLineTypeEnum BlockType { get; set; }
+		public TextLineTypeEnum BlockType { get; set; } = TextLineTypeEnum.P;
 	}
 }

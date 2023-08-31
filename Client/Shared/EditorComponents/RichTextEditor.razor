@@ -7,6 +7,10 @@
 <button class="@(SelectionFormatContains(FormatBlockTypeEnum.B) ? "format-button-selected" : "")" @onclick="@(() => FormatItem(FormatBlockTypeEnum.B))">B</button>
 <button class="@(SelectionFormatContains(FormatBlockTypeEnum.I) ? "format-button-selected" : "")" @onclick="@(() => FormatItem(FormatBlockTypeEnum.I))"><i>I</i></button>
 <button class="@(SelectionFormatContains(FormatBlockTypeEnum.U) ? "format-button-selected" : "")" @onclick="@(() => FormatItem(FormatBlockTypeEnum.U))"><u>U</u></button>
+<button @onclick="ConvertToHtml">HTML</button>
+<button class="@(Blocks[_cursorIndex.Item1].BlockType == TextLineTypeEnum.H1 ? "format-button-selected" : "")" @onclick="@(() => Blocks[_cursorIndex.Item1].BlockType = TextLineTypeEnum.H1)">H1</button>
+<button class="@(Blocks[_cursorIndex.Item1].BlockType == TextLineTypeEnum.H2 ? "format-button-selected" : "")" @onclick="@(() => Blocks[_cursorIndex.Item1].BlockType = TextLineTypeEnum.H2)">H2</button>
+<button class="@(Blocks[_cursorIndex.Item1].BlockType == TextLineTypeEnum.P ? "format-button-selected" : "")" @onclick="@(() => Blocks[_cursorIndex.Item1].BlockType = TextLineTypeEnum.P)">P</button>
 <div tabindex="0" style="background-color: white" @onkeydown="KeyDown" @ref="inputBoxRef" class="rich-text-editor-container" @onmousedown:preventDefault @onmouseup="SelectionEnd" @onpointerleave="SelectionEnd" @onmouseup:preventDefault>
 	@{
 		blockIndex = 0;
@@ -15,7 +19,7 @@
 	{
 		int j = blockIndex;
 
-		<p class="text-line">
+		<DynamicHtmlTag HtmlTag="@block.BlockType" CssClasses="text-line">
 			@{
 				loopIndex = 0;
 			}
@@ -67,16 +71,16 @@
 					<div class="text-cursor"></div>
 				}
 			</span>
-			<span class="rte-white-space" @onclick="() => MoveCursor(j, block.FormatBlocks.Count()-1)"></span>
-		</p>
+			<span class="rte-white-space" @onclick="() => MoveCursor(j, block.FormatBlocks.Count()-1, true)"></span>
+		</DynamicHtmlTag>
 		blockIndex++;
 	}
 </div>
-@_cursorIndex
-@foreach (var entry in log)
+@((MarkupString)html)
+@*@foreach (var entry in log)
 {
 	<p>@entry</p>
-}
+}*@
 
 
 @code {
@@ -93,6 +97,7 @@
 	private Tuple<int, int>? lowerValue { get; set; }
 	private Tuple<int, int>? higherValue { get; set; }
 	private bool isMouseDown { get; set; } = false;
+	public string html { get; set; } = "";
 
 	private string _alphaNumericCharacterPattern = "^[a-zA-Z0-9.,@£$%!?&*^()\\[\\]\\/{} ]$";
 
@@ -326,10 +331,68 @@
 		return deleteSuccess;
 	}
 
-	private async void MoveCursor(int blockIndex, int characterIndex)
+	private async void MoveCursor(int blockIndex, int characterIndex, bool? cancelSelection = false)
 	{
+		if (cancelSelection == true)
+		{
+			Blocks.ForEach(b => b.FormatBlocks.ForEach(f => f.IsSelected = false));
+		}
+
 		await inputBoxRef.FocusAsync();
 		_cursorIndex = new Tuple<int, int>(blockIndex, characterIndex);
 		StateHasChanged();
+	}
+
+	private void ConvertToHtml()
+	{
+		foreach (var block in Blocks)
+		{
+			html = "";
+			html += $"<p>";
+			FormatBlockTypeEnum lastFormat = FormatBlockTypeEnum.None;
+
+			var placeHolderFormatBlock = new FormatBlock { Content = "*" };
+			block.FormatBlocks.Add(placeHolderFormatBlock);
+
+			foreach (var character in block.FormatBlocks)
+			{
+
+				if ((lastFormat & FormatBlockTypeEnum.I) == 0 && (character.Format & FormatBlockTypeEnum.I) != 0)
+				{
+					html += $"<i>";
+				}
+				if ((lastFormat & FormatBlockTypeEnum.U) == 0 && (character.Format & FormatBlockTypeEnum.U) != 0)
+				{
+					html += $"<u>";
+				}
+				if ((lastFormat & FormatBlockTypeEnum.B) == 0 && (character.Format & FormatBlockTypeEnum.B) != 0)
+				{
+					html += $"<b>";
+				}
+				if ((lastFormat & FormatBlockTypeEnum.B) != 0 && ((character.Format & FormatBlockTypeEnum.B) == 0))
+				{
+					html += $"</b>";
+				}
+				if ((lastFormat & FormatBlockTypeEnum.U) != 0 && ((character.Format & FormatBlockTypeEnum.U) == 0))
+				{
+					html += $"</u>";
+				}
+				if ((lastFormat & FormatBlockTypeEnum.I) != 0 && ((character.Format & FormatBlockTypeEnum.I) == 0))
+				{
+					html += $"</i>";
+				}
+
+				if(character != placeHolderFormatBlock)
+				{
+					html += $"{character.Content}";
+				}
+
+				lastFormat = character.Format;
+			}
+
+			block.FormatBlocks.Remove(placeHolderFormatBlock);
+
+			html += $"</p>";
+		}
 	}
 }
