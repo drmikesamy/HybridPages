@@ -1,0 +1,124 @@
+﻿@using HybridPages.Client.State;
+@using HybridPages.Shared.Enums;
+@using HybridPages.Shared.Models.TextEditor;
+@using System.Text.RegularExpressions;
+@using System.Text.Json;
+@inject PageService _pageService;
+@page "/rte"
+<div tabindex="0" style="background-color: white" @onkeydown="KeyDown" @ref="inputBoxRef" class="rich-text-editor-container" @onmousedown:preventDefault @onmouseup="SelectionEnd" @onpointerleave="SelectionEnd" @onmouseup:preventDefault>
+	@{
+		_blockIndex = 0;
+	}
+	@foreach (var block in Blocks)
+	{
+		int b = _blockIndex;
+		_characterIndex = 0;
+		<div>
+			@foreach (var character in block.FormatBlocks)
+			{
+				int i = _characterIndex;
+				<span class="text-cursor-shift @(_characterSelection.IsSelected(b, i) ? "selection-highlight" : "")" @onclick:stopPropagation="true" @onmousedown="() => SelectionStart(b, i)" @onmouseenter="() => SelectionAdd(b, i)" @onmouseup="SelectionEnd" @onmousedown:preventDefault @onmouseup:preventDefault>
+					@character.Content
+				</span>
+				if (b == _characterSelection.CursorBlock && i == _characterSelection.CursorChar)
+				{
+					<div class="text-cursor"></div>
+				}
+				_characterIndex++;
+			}
+		</div>
+		_blockIndex++;
+	}
+</div>
+<div style="background-color: white">
+	<pre>
+		@(JsonSerializer.Serialize(Blocks, new JsonSerializerOptions() { WriteIndented = true }))
+	</pre>
+</div>
+
+
+@code {
+	public List<Block> Blocks { get; set; } = new List<Block>();
+
+	private int _blockIndex { get; set; }
+	private int _characterIndex { get; set; }
+
+	private ElementReference inputBoxRef { get; set; }
+
+	private bool isMouseDown { get; set; } = false;
+	public string Content { get; set; } = "Testing123";
+	public List<FormatBlock> ContentArray { get; set; }
+
+	private CharacterSelection _characterSelection { get; set; }
+
+	private string _alphaNumericCharacterPattern = "^[a-zA-Z0-9.,@£$%!?&*^()\\[\\]\\/{} ]$";
+
+	protected override async Task OnInitializedAsync()
+	{
+		ContentArray = Content.ToCharArray().Select(i => new FormatBlock(i.ToString())).ToList();
+		Blocks.Add(new Block { FormatBlocks = ContentArray });
+		_characterSelection = new CharacterSelection();
+		_characterSelection.SetCursorPos(0, Blocks[0].FormatBlocks.Count() - 1);
+	}
+	private async Task KeyDown(KeyboardEventArgs e)
+	{
+		switch (true)
+		{
+			case bool _ when Regex.IsMatch(e.Key, _alphaNumericCharacterPattern):
+				var blockObj = Blocks[_characterSelection.CursorBlock];
+				var charObj = new FormatBlock(e.Key);
+				blockObj.FormatBlocks.Insert(_characterSelection.CursorChar + 1, charObj);
+				_characterSelection.SetCursorPos(Blocks.IndexOf(blockObj), blockObj.FormatBlocks.IndexOf(charObj));
+				break;
+			case bool _ when e.Key == "Enter":
+				DeleteSelection();
+				Blocks.Insert(_characterSelection.StartBlock + 1, new Block());
+				_characterSelection.SetCursorPos(_characterSelection.StartBlock + 1, -1);
+				StateHasChanged();
+				break;
+			case bool _ when e.Key == "Backspace":
+				DeleteSelection();
+				break;
+		}
+		StateHasChanged();
+	}
+
+	private void DeleteSelection()
+	{
+		if (_characterSelection.StartBlock < _characterSelection.EndBlock)
+		{
+			Blocks[_characterSelection.StartBlock].FormatBlocks.RemoveRange(_characterSelection.StartChar, Blocks[_characterSelection.StartBlock].FormatBlocks.Count() - 1 - _characterSelection.StartChar);
+			Blocks[_characterSelection.StartBlock].FormatBlocks.AddRange(Blocks[_characterSelection.EndBlock].FormatBlocks.Take(_characterSelection.EndChar));
+			for (var i = _characterSelection.StartBlock + 1; i <= _characterSelection.EndBlock; i++)
+			{
+				Blocks.RemoveAt(i);
+			}
+		}
+		else
+		{
+			Blocks[_characterSelection.StartBlock].FormatBlocks.RemoveRange(_characterSelection.StartChar + 1, _characterSelection.EndChar - _characterSelection.StartChar);
+		}
+		_characterSelection.SetCursorPos(_characterSelection.StartBlock, _characterSelection.StartChar);
+
+	}
+
+	private async Task SelectionStart(int block, int index)
+	{
+		inputBoxRef.FocusAsync();
+		isMouseDown = true;
+		_characterSelection.SetCursorPos(block, index);
+	}
+	private async Task SelectionAdd(int block, int index)
+	{
+		if (isMouseDown)
+		{
+			_characterSelection.CursorBlock = block;
+			_characterSelection.CursorChar = index;
+		}
+	}
+	public void SelectionEnd()
+	{
+		isMouseDown = false;
+
+	}
+}

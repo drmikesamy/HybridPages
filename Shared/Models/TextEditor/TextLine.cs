@@ -1,4 +1,5 @@
 ﻿using HybridPages.Shared.Enums;
+using System.Xml.Linq;
 
 namespace HybridPages.Shared.Models.TextEditor
 {
@@ -10,13 +11,58 @@ namespace HybridPages.Shared.Models.TextEditor
 	}
 	public class FormatBlock
 	{
+		public FormatBlock(string character)
+		{
+			Content = character;
+		}
 		public string Content { get; set; } = "";
 		public FormatBlockTypeEnum Format { get; set; } = FormatBlockTypeEnum.None;
-		public bool IsSelected { get; set; } = false;
 	}
 	public class Block
 	{
-		public List<FormatBlock> FormatBlocks { get; set; } = new List<FormatBlock> { };
+		public List<FormatBlock> FormatBlocks { get; set; } = new List<FormatBlock> { new FormatBlock("") };
 		public TextLineTypeEnum BlockType { get; set; } = TextLineTypeEnum.P;
+	}
+	public class CharacterSelection
+	{
+		private int _cursorBlock;
+		private int _cursorChar;
+		public int StartBlock { get; set; }
+		public int StartChar { get; set; }
+		public int EndBlock { get; set; }
+		public int EndChar { get; set; }
+		public int AnchorBlock { get; set; }
+		public int AnchorChar { get; set; }
+		public int CursorBlock
+		{
+			get { return _cursorBlock; }
+			set
+			{
+				_cursorBlock = value;
+				StartBlock = Math.Min(AnchorBlock, _cursorBlock);
+				EndBlock = Math.Max(AnchorBlock, _cursorBlock);
+			}
+		}
+		public int CursorChar {
+			get { return _cursorChar; }
+			set
+			{
+				_cursorChar = value;
+				StartChar = Math.Min(AnchorChar, _cursorChar);
+				EndChar = Math.Max(AnchorChar, _cursorChar);
+			}
+		}
+		public void SetCursorPos(int blockIndex, int charIndex)
+		{
+			AnchorBlock = blockIndex;
+			AnchorChar = charIndex;
+			CursorBlock = blockIndex;
+			CursorChar = charIndex;
+		}
+		public bool IsSelected(int blockIndex, int charIndex)
+		{
+			if((blockIndex > StartBlock && blockIndex < EndBlock) || (blockIndex == StartBlock && EndBlock > StartBlock && charIndex > StartChar) || (blockIndex == EndBlock && EndBlock > StartBlock && charIndex <= EndChar) || (StartBlock == EndBlock && charIndex <= EndChar && charIndex > StartChar)) return true;
+			return false;
+		}
 	}
 }

@@ -1,4 +1,4 @@
-﻿@using HybridPages.Client.State;
+﻿@* @using HybridPages.Client.State;
 @using HybridPages.Shared.Enums;
 @using HybridPages.Shared.Models.TextEditor;
 @using System.Text.RegularExpressions;
@@ -12,387 +12,389 @@
 <button class="@(Blocks[_cursorIndex.Item1].BlockType == TextLineTypeEnum.H2 ? "format-button-selected" : "")" @onclick="@(() => Blocks[_cursorIndex.Item1].BlockType = TextLineTypeEnum.H2)">H2</button>
 <button class="@(Blocks[_cursorIndex.Item1].BlockType == TextLineTypeEnum.P ? "format-button-selected" : "")" @onclick="@(() => Blocks[_cursorIndex.Item1].BlockType = TextLineTypeEnum.P)">P</button>
 <div tabindex="0" style="background-color: white" @onkeydown="KeyDown" @ref="inputBoxRef" class="rich-text-editor-container" @onmousedown:preventDefault @onmouseup="SelectionEnd" @onpointerleave="SelectionEnd" @onmouseup:preventDefault>
-	@{
-		blockIndex = 0;
-	}
-	@foreach (var block in Blocks)
-	{
-		int j = blockIndex;
+    @{
+        blockIndex = 0;
+    }
+    @foreach (var block in Blocks)
+    {
+        int j = blockIndex;
 
-		<DynamicHtmlTag HtmlTag="@block.BlockType" CssClasses="text-line">
-			@{
-				loopIndex = 0;
-			}
-			<span class="rte-text-space">
-				@foreach (var character in block.FormatBlocks)
-				{
-					int i = loopIndex;
+        <DynamicHtmlTag HtmlTag="@block.BlockType" CssClasses="text-line">
+            @{
+                loopIndex = 0;
+            }
+            <span class="rte-text-space">
+                @foreach (var character in block.FormatBlocks)
+                {
+                    int i = loopIndex;
 
-					<span class="text-cursor-shift @(character.IsSelected ? "selection-highlight" : "")" @onclick="() => MoveCursor(j, i)" @onclick:stopPropagation="true" @onmousedown="() => SelectionStart(j, i)" @onmouseenter="(e) => SelectionAdd(j, i, e)" @onmouseup="SelectionEnd" @onmousedown:preventDefault @onmouseup:preventDefault>
-						@switch (character.Format)
-						{
-							case FormatBlockTypeEnum.None:
-								@character.Content
-								break;
-							case FormatBlockTypeEnum.I:
-								<i>@character.Content</i>
-								break;
-							case FormatBlockTypeEnum.B:
-								<b>@character.Content</b>
-								break;
-							case FormatBlockTypeEnum.U:
-								<u>@character.Content</u>
-								break;
-							case FormatBlockTypeEnum.I | FormatBlockTypeEnum.U:
-								<i><u>@character.Content</u></i>
-								break;
-							case FormatBlockTypeEnum.B | FormatBlockTypeEnum.U:
-								<b><u>@character.Content</u></b>
-								break;
-							case FormatBlockTypeEnum.I | FormatBlockTypeEnum.B:
-								<i><b>@character.Content</b></i>
-								break;
-							case FormatBlockTypeEnum.I | FormatBlockTypeEnum.B | FormatBlockTypeEnum.U:
-								<i><b><u>@character.Content</u></b></i>
-								break;
-						}
-					</span>
+                    <span class="text-cursor-shift @(character.IsSelected ? "selection-highlight" : "")" @onclick="() => MoveCursor(j, i)" @onclick:stopPropagation="true" @onmousedown="() => SelectionStart(j, i)" @onmouseenter="(e) => SelectionAdd(j, i, e)" @onmouseup="SelectionEnd" @onmousedown:preventDefault @onmouseup:preventDefault>
+                        @switch (character.Format)
+                        {
+                            case FormatBlockTypeEnum.None:
+                                @character.Content
+                                break;
+                            case FormatBlockTypeEnum.I:
+                                <i>@character.Content</i>
+                                break;
+                            case FormatBlockTypeEnum.B:
+                                <b>@character.Content</b>
+                                break;
+                            case FormatBlockTypeEnum.U:
+                                <u>@character.Content</u>
+                                break;
+                            case FormatBlockTypeEnum.I | FormatBlockTypeEnum.U:
+                                <i><u>@character.Content</u></i>
+                                break;
+                            case FormatBlockTypeEnum.B | FormatBlockTypeEnum.U:
+                                <b><u>@character.Content</u></b>
+                                break;
+                            case FormatBlockTypeEnum.I | FormatBlockTypeEnum.B:
+                                <i><b>@character.Content</b></i>
+                                break;
+                            case FormatBlockTypeEnum.I | FormatBlockTypeEnum.B | FormatBlockTypeEnum.U:
+                                <i><b><u>@character.Content</u></b></i>
+                                break;
+                        }
+                    </span>
 
-					@if (j == _cursorIndex.Item1 && i == _cursorIndex.Item2)
-					{
-						<div class="text-cursor"></div>
-					}
+                    @if (j == _cursorIndex.Item1 && i == _cursorIndex.Item2)
+                    {
+                        <div class="text-cursor"></div>
+                    }
 
 
-					loopIndex++;
-				}
-				@if (j == _cursorIndex.Item1 && block.FormatBlocks.Count() == 0)
-				{
-					<div class="text-cursor"></div>
-				}
-			</span>
-			<span class="rte-white-space" @onclick="() => MoveCursor(j, block.FormatBlocks.Count()-1, true)"></span>
-		</DynamicHtmlTag>
-		blockIndex++;
-	}
+                    loopIndex++;
+                }
+                @if (j == _cursorIndex.Item1 && block.FormatBlocks.Count() == 0)
+                {
+                    <div class="text-cursor"></div>
+                }
+            </span>
+            <span class="rte-white-space" @onclick="() => MoveCursor(j, block.FormatBlocks.Count()-1, true)"></span>
+        </DynamicHtmlTag>
+        blockIndex++;
+    }
 </div>
 @((MarkupString)html)
-@*@foreach (var entry in log)
+@foreach (var entry in log)
 {
-	<p>@entry</p>
-}*@
+    <p>@entry</p>
+}
 
+<p>Cursor Block: @_cursorIndex.Item1</p>
+<p>Cursor Char: @_cursorIndex.Item2</p>
+<p>Selection Start Block: @selectionStart?.Item1</p>
+<p>Selection Start Char: @selectionStart?.Item2</p>
+<p>Selection End Block: @selectionEnd?.Item1</p>
+<p>Selection End Char: @selectionEnd?.Item2</p>
+<p>Current Block Count: @Blocks[_cursorIndex.Item1].FormatBlocks.Count()</p>
 
 @code {
-	public string Content { get; set; } = "Testing123";
-	public List<Block> Blocks { get; set; } = new List<Block>();
-	public List<FormatBlock> ContentArray { get; set; }
-	private Tuple<int, int> _cursorIndex { get; set; }
-	private List<string> log { get; set; } = new();
-	public int loopIndex { get; set; }
-	public int blockIndex { get; set; }
-	private ElementReference inputBoxRef { get; set; }
-	private Tuple<int, int>? selectionStart { get; set; }
-	private Tuple<int, int>? selectionEnd { get; set; }
-	private Tuple<int, int>? lowerValue { get; set; }
-	private Tuple<int, int>? higherValue { get; set; }
-	private bool isMouseDown { get; set; } = false;
-	public string html { get; set; } = "";
+    public string Content { get; set; } = "Testing123";
+    public List<Block> Blocks { get; set; } = new List<Block>();
+    public List<FormatBlock> ContentArray { get; set; }
+    private Tuple<int, int> _cursorIndex { get; set; }
+    private List<string> log { get; set; } = new();
+    public int loopIndex { get; set; }
+    public int blockIndex { get; set; }
+    private ElementReference inputBoxRef { get; set; }
+    private Tuple<int, int>? selectionStart { get; set; }
+    private Tuple<int, int>? selectionEnd { get; set; }
+    private Tuple<int, int>? lowerValue { get; set; }
+    private Tuple<int, int>? higherValue { get; set; }
+    private bool isMouseDown { get; set; } = false;
+    public string html { get; set; } = "";
 
-	private string _alphaNumericCharacterPattern = "^[a-zA-Z0-9.,@£$%!?&*^()\\[\\]\\/{} ]$";
+    private string _alphaNumericCharacterPattern = "^[a-zA-Z0-9.,@£$%!?&*^()\\[\\]\\/{} ]$";
 
-	protected override async Task OnInitializedAsync()
-	{
-		ContentArray = Content.ToCharArray().Select(i => new FormatBlock { Content = i.ToString() }).ToList();
-		Blocks.Add(new Block { FormatBlocks = ContentArray });
-		_cursorIndex = new Tuple<int, int>(0, ContentArray.Count() - 1);
-	}
+    protected override async Task OnInitializedAsync()
+    {
+        ContentArray = Content.ToCharArray().Select(i => new FormatBlock(i.ToString())).ToList();
+        Blocks.Add(new Block { FormatBlocks = ContentArray });
+        _cursorIndex = new Tuple<int, int>(0, ContentArray.Count() - 1);
+    }
 
-	private void AddBlock(int? index = null)
-	{
-		if (index != null)
-		{
-			Blocks.Insert(index.Value + 1, new Block());
-		}
-		else
-		{
-			Blocks.Add(new Block());
-		}
+    private void AddBlock(int? index = null)
+    {
+        if (index != null)
+        {
+            Blocks.Insert(index.Value + 1, new Block());
+        }
+        else
+        {
+            Blocks.Add(new Block());
+        }
 
-	}
+    }
 
-	private bool SelectionFormatContains(FormatBlockTypeEnum formatFlag)
-	{
-		var firstSelectedBlock = Blocks.SelectMany(b => b.FormatBlocks).FirstOrDefault(f => f.IsSelected);
-		if (firstSelectedBlock == null)
-			return false;
-		return (firstSelectedBlock.Format & formatFlag) != 0;
-	}
+    private bool SelectionFormatContains(FormatBlockTypeEnum formatFlag)
+    {
+        var firstSelectedBlock = Blocks.SelectMany(b => b.FormatBlocks).FirstOrDefault(f => f.IsSelected);
+        if (firstSelectedBlock == null)
+            return false;
+        return (firstSelectedBlock.Format & formatFlag) != 0;
+    }
 
-	private void FormatItem(FormatBlockTypeEnum formatFlag)
-	{
-		var selectedItems = Blocks.SelectMany(b => b.FormatBlocks.Where(fb => fb.IsSelected));
-		var itemCount = 0;
-		var flagAdded = false;
-		var flagRemoved = false;
-		foreach (var item in selectedItems)
-		{
-			if (itemCount == 0)
-			{
-				if ((item.Format & formatFlag) == 0)
-				{
-					item.Format |= formatFlag;
-					flagAdded = true;
-				}
-				else
-				{
-					item.Format &= ~formatFlag;
-					flagRemoved = true;
-				}
-			}
-			else
-			{
-				if (flagAdded)
-				{
-					item.Format |= formatFlag;
-				}
-				else if (flagRemoved)
-				{
-					item.Format &= ~formatFlag;
-				}
-			}
-			itemCount++;
-		}
+    private void FormatItem(FormatBlockTypeEnum formatFlag)
+    {
+        var selectedItems = Blocks.SelectMany(b => b.FormatBlocks.Where(fb => fb.IsSelected));
+        var itemCount = 0;
+        var flagAdded = false;
+        var flagRemoved = false;
+        foreach (var item in selectedItems)
+        {
+            if (itemCount == 0)
+            {
+                if ((item.Format & formatFlag) == 0)
+                {
+                    item.Format |= formatFlag;
+                    flagAdded = true;
+                }
+                else
+                {
+                    item.Format &= ~formatFlag;
+                    flagRemoved = true;
+                }
+            }
+            else
+            {
+                if (flagAdded)
+                {
+                    item.Format |= formatFlag;
+                }
+                else if (flagRemoved)
+                {
+                    item.Format &= ~formatFlag;
+                }
+            }
+            itemCount++;
+        }
 
-	}
+    }
 
-	private async Task SelectionStart(int blockIndex, int index)
-	{
-		Blocks.ForEach(b => b.FormatBlocks.ForEach(f => f.IsSelected = false));
-		selectionEnd = null;
-		isMouseDown = true;
-		await inputBoxRef.FocusAsync();
-		selectionStart = new Tuple<int, int>(blockIndex, index);
-		StateHasChanged();
-	}
-	private async Task SelectionAdd(int blockIndex, int index, MouseEventArgs e)
-	{
-		if (selectionStart != null && isMouseDown)
-		{
-			var leftToRight = blockIndex > selectionStart.Item1
-			|| blockIndex == selectionStart.Item1 && index > selectionStart.Item2;
-			selectionEnd = new Tuple<int, int>(blockIndex, index);
-			if (leftToRight)
-			{
-				FillSelection(selectionStart.Item1, selectionStart.Item2, selectionEnd.Item1, selectionEnd.Item2, null);
-			}
-			else
-			{
-				FillSelection(selectionEnd.Item1, selectionEnd.Item2, selectionStart.Item1, selectionStart.Item2, null);
-			}
-			if ((selectionStart.Item1 == selectionEnd.Item1 && selectionStart.Item2 < selectionEnd.Item2) || selectionStart.Item1 < selectionEnd.Item1)
-			{
-				MoveCursor(selectionEnd.Item1, selectionEnd.Item2);
-			}
-			else
-			{
-				MoveCursor(selectionEnd.Item1, selectionEnd.Item2 - 1);
-			}
-			StateHasChanged();
-		}
-	}
+    private async Task SelectionStart(int blockIndex, int index)
+    {
+        Blocks.ForEach(b => b.FormatBlocks.ForEach(f => f.IsSelected = false));
+        selectionEnd = null;
+        isMouseDown = true;
+        await inputBoxRef.FocusAsync();
+        selectionStart = new Tuple<int, int>(blockIndex, index);
+        StateHasChanged();
+    }
+    private async Task SelectionAdd(int blockIndex, int index, MouseEventArgs e)
+    {
+        Blocks.ForEach(b => b.FormatBlocks.ForEach(f => f.IsSelected = false));
+        if (selectionStart != null && isMouseDown)
+        {
+            var leftToRight = blockIndex > selectionStart.Item1
+            || blockIndex == selectionStart.Item1 && index > selectionStart.Item2;
+            selectionEnd = new Tuple<int, int>(blockIndex, index);
+            if (leftToRight)
+            {
+                FillSelection(selectionStart.Item1, selectionStart.Item2, selectionEnd.Item1, selectionEnd.Item2, null);
+            }
+            else
+            {
+                FillSelection(selectionEnd.Item1, selectionEnd.Item2, selectionStart.Item1, selectionStart.Item2, null);
+            }
+            if ((selectionStart.Item1 == selectionEnd.Item1 && selectionStart.Item2 < selectionEnd.Item2) || selectionStart.Item1 < selectionEnd.Item1)
+            {
+                MoveCursor(selectionEnd.Item1, selectionEnd.Item2);
+            }
+            else
+            {
+                MoveCursor(selectionEnd.Item1, selectionEnd.Item2 - 1);
+            }
+            StateHasChanged();
+        }
+    }
 
-	private void FillSelection(int currentBlock, int currentChar, int terminalBlock, int terminalChar, int? charCount)
-	{
-		if (currentBlock == terminalBlock && currentChar == terminalChar + 1)
-		{
-			return;
-		}
+    private void FillSelection(int currentBlock, int currentChar, int terminalBlock, int terminalChar, int? charCount)
+    {
+        if (currentBlock == terminalBlock && currentChar == terminalChar + 1)
+        {
+            return;
+        }
 
-		if (currentChar <= 0 || charCount == null)
-		{
-			charCount = Blocks[currentBlock].FormatBlocks.Count();
-		}
+        if (currentChar <= 0 || charCount == null)
+        {
+            charCount = Blocks[currentBlock].FormatBlocks.Count();
+        }
 
-		if (currentChar == charCount)
-		{
-			currentBlock++;
-			currentChar = 0;
-		}
-		else
-		{
-			Blocks[currentBlock].FormatBlocks[currentChar].IsSelected = true;
-			currentChar++;
-		}
+        if (currentChar == charCount)
+        {
+            currentBlock++;
+            currentChar = 0;
+        }
+        else
+        {
+            Blocks[currentBlock].FormatBlocks[currentChar].IsSelected = true;
+            currentChar++;
+        }
 
-		FillSelection(currentBlock, currentChar, terminalBlock, terminalChar, charCount);
-	}
+        FillSelection(currentBlock, currentChar, terminalBlock, terminalChar, charCount);
+    }
 
-	private async Task SelectionEnd()
-	{
-		await inputBoxRef.FocusAsync();
-		isMouseDown = false;
-		StateHasChanged();
-	}
+    private async Task SelectionEnd()
+    {
+        await inputBoxRef.FocusAsync();
+        isMouseDown = false;
+        StateHasChanged();
+    }
 
-	private async Task KeyDown(KeyboardEventArgs e)
-	{
-		bool deleted;
-		switch (true)
-		{
-			case bool _ when Regex.IsMatch(e.Key, _alphaNumericCharacterPattern):
+    private async Task KeyDown(KeyboardEventArgs e)
+    {
+        bool deleted;
 
-				Blocks[_cursorIndex.Item1].FormatBlocks.Insert(_cursorIndex.Item2 + 1, new FormatBlock { Content = e.Key });
-				_cursorIndex = new Tuple<int, int>(_cursorIndex.Item1, _cursorIndex.Item2 + 1);
-				if (selectionStart != null && selectionEnd != null)
-				{
-					selectionStart = new Tuple<int, int>(selectionStart.Item1, selectionStart.Item2 + 1);
-					selectionEnd = new Tuple<int, int>(selectionEnd.Item1, selectionEnd.Item2 + 1);
-					deleted = DeleteSelection();
-				}
-				break;
-			case bool _ when e.Key == "Enter":
+        switch (true)
+        {
+            case bool _ when Regex.IsMatch(e.Key, _alphaNumericCharacterPattern):
+                DeleteSelection(selectionStart?.Item1, selectionStart?.Item2, selectionEnd?.Item1, selectionEnd?.Item2);
+                Blocks[_cursorIndex.Item1].FormatBlocks.Insert(_cursorIndex.Item2 + 1, new FormatBlock(e.Key));
+                _cursorIndex = new Tuple<int, int>(_cursorIndex.Item1, _cursorIndex.Item2 + 1);
 
-				var blocksToMove = Blocks[_cursorIndex.Item1].FormatBlocks.Where(f => Blocks[_cursorIndex.Item1].FormatBlocks.IndexOf(f) > _cursorIndex.Item2);
+                break;
+            case bool _ when e.Key == "Enter":
+                DeleteSelection(selectionStart?.Item1, selectionStart?.Item2, selectionEnd?.Item1, selectionEnd?.Item2);
+                var blocksToMove = Blocks[_cursorIndex.Item1].FormatBlocks.Where(f => Blocks[_cursorIndex.Item1].FormatBlocks.IndexOf(f) > _cursorIndex.Item2);
 
-				if (_cursorIndex.Item1 < Blocks.Count())
-				{
-					AddBlock(_cursorIndex.Item1);
-				}
-				else
-				{
-					AddBlock();
-				}
+                if (_cursorIndex.Item1 < Blocks.Count())
+                {
+                    AddBlock(_cursorIndex.Item1);
+                }
+                else
+                {
+                    AddBlock();
+                }
 
-				Blocks[_cursorIndex.Item1 + 1].FormatBlocks.AddRange(blocksToMove);
-				Blocks[_cursorIndex.Item1].FormatBlocks.RemoveRange(_cursorIndex.Item2 + 1, blocksToMove.Count());
+                Blocks[_cursorIndex.Item1 + 1].FormatBlocks.AddRange(blocksToMove);
+                Blocks[_cursorIndex.Item1].FormatBlocks.RemoveRange(_cursorIndex.Item2 + 1, blocksToMove.Count());
 
-				_cursorIndex = new Tuple<int, int>(_cursorIndex.Item1 + 1, -1);
-				break;
-			case bool _ when e.Key == "Backspace":
-				//deleted = DeleteSelection();
-				if (_cursorIndex.Item1 >= 0 && _cursorIndex.Item2 >= 0)
-				{
-					Blocks[_cursorIndex.Item1].FormatBlocks.RemoveAt(_cursorIndex.Item2);
-					_cursorIndex = new Tuple<int, int>(_cursorIndex.Item1, _cursorIndex.Item2 - 1);
-				}
-				else if (_cursorIndex.Item1 > 0 && _cursorIndex.Item2 == -1)
-				{
-					var lastIndexOfPrevBlock = Blocks[_cursorIndex.Item1 - 1].FormatBlocks.Count() - 1;
-					Blocks.RemoveAt(_cursorIndex.Item1);
-					MoveCursor(_cursorIndex.Item1 - 1, lastIndexOfPrevBlock);
-				}
-				break;
-			case bool _ when e.Key == "Delete":
-				deleted = DeleteSelection();
-				if (!deleted && _cursorIndex.Item2 < Blocks[_cursorIndex.Item1].FormatBlocks.Count() - 1)
-				{
-					Blocks[_cursorIndex.Item1].FormatBlocks.RemoveAt(_cursorIndex.Item2 + 1);
-				}
-				break;
-			case bool _ when e.Key == "ArrowLeft":
-				if (_cursorIndex.Item1 >= 0 && _cursorIndex.Item2 >= 0)
-					_cursorIndex = new Tuple<int, int>(_cursorIndex.Item1, _cursorIndex.Item2 - 1);
-				break;
-			case bool _ when e.Key == "ArrowRight":
-				if (_cursorIndex.Item2 < Blocks[_cursorIndex.Item1].FormatBlocks.Count() - 1)
-					_cursorIndex = new Tuple<int, int>(_cursorIndex.Item1, _cursorIndex.Item2 + 1);
-				break;
-			default:
+                _cursorIndex = new Tuple<int, int>(_cursorIndex.Item1 + 1, -1);
 
-				break;
-		}
-		selectionStart = selectionEnd = null;
-		StateHasChanged();
-	}
 
-	private bool DeleteSelection()
-	{
-		var deleteSuccess = false;
-		foreach (var block in Blocks)
-		{
-			if (block.FormatBlocks.All(fb => fb.IsSelected))
-			{
-				var removed = Blocks.Remove(block);
-				if (removed)
-				{
-					deleteSuccess = true;
-				}
-			}
-			else
-			{
-				var removed = block.FormatBlocks.RemoveAll(fb => fb.IsSelected);
-				if (removed > 0)
-				{
-					deleteSuccess = true;
-				}
-			}
-		}
-		return deleteSuccess;
-	}
+                break;
+            case bool _ when e.Key == "Backspace":
+                    if (selectionStart == null && selectionEnd == null)
+                    {
+                        selectionStart = new Tuple<int, int>(_cursorIndex.Item1, _cursorIndex.Item2);
+                        selectionEnd = new Tuple<int, int>(_cursorIndex.Item1, _cursorIndex.Item2);
+                        FillSelection(selectionStart.Item1, selectionStart.Item2, selectionEnd.Item1, selectionEnd.Item2, -1);
+                    } 
+                    DeleteSelection(selectionStart.Item1, selectionStart.Item2, selectionEnd.Item1, selectionEnd.Item2);
+                break;
+            case bool _ when e.Key == "Delete":
+                if(_cursorIndex.Item2 >= 0 && _cursorIndex.Item2 < Blocks[_cursorIndex.Item1].FormatBlocks.Count())
+                {
+                    if (selectionStart == null && selectionEnd == null)
+                    {
+                        selectionStart = new Tuple<int, int>(_cursorIndex.Item1, _cursorIndex.Item2 + 1);
+                        selectionEnd = new Tuple<int, int>(_cursorIndex.Item1, _cursorIndex.Item2 + 1);
+                    }
+                    FillSelection(selectionStart.Item1, selectionStart.Item2, selectionEnd.Item1, selectionEnd.Item2, 1);
+                    DeleteSelection(selectionStart.Item1, selectionStart.Item2, selectionEnd.Item1, selectionEnd.Item2);
+                }
+                break;
+            case bool _ when e.Key == "ArrowLeft":
+                if (_cursorIndex.Item1 >= 0 && _cursorIndex.Item2 >= 0)
+                    _cursorIndex = new Tuple<int, int>(_cursorIndex.Item1, _cursorIndex.Item2 - 1);
+                break;
+            case bool _ when e.Key == "ArrowRight":
+                if (_cursorIndex.Item2 < Blocks[_cursorIndex.Item1].FormatBlocks.Count() - 1)
+                    _cursorIndex = new Tuple<int, int>(_cursorIndex.Item1, _cursorIndex.Item2 + 1);
+                break;
+            default:
 
-	private async void MoveCursor(int blockIndex, int characterIndex, bool? cancelSelection = false)
-	{
-		if (cancelSelection == true)
-		{
-			Blocks.ForEach(b => b.FormatBlocks.ForEach(f => f.IsSelected = false));
-		}
+                break;
+        }
+        selectionStart = selectionEnd = null;
+        StateHasChanged();
+    }
 
-		await inputBoxRef.FocusAsync();
-		_cursorIndex = new Tuple<int, int>(blockIndex, characterIndex);
-		StateHasChanged();
-	}
+    private void DeleteSelection(int? fromBlock = null, int? fromChar = null, int? toBlock = null, int? toChar = null, int? charCount = null)
+    {
+        if (fromBlock != null && toBlock != null && toChar != null && fromChar != null)
+        {
+            for (var i = 0; i <= toBlock - fromBlock; i++)
+            {
+                Blocks[i].FormatBlocks.RemoveAll(b => b.IsSelected);
+                if (Blocks[i].FormatBlocks.Count() == 0)
+                {
+                    Blocks.Remove(Blocks[i]);
+                }
+            }
+            if (toBlock - fromBlock > 0)
+            {
+                Blocks[fromBlock.Value].FormatBlocks.AddRange(Blocks[toBlock.Value].FormatBlocks);
+            }
+            
+            MoveCursor(fromBlock.Value, fromChar.Value - 1);
+        }
+    }
 
-	private void ConvertToHtml()
-	{
-		foreach (var block in Blocks)
-		{
-			html = "";
-			html += $"<p>";
-			FormatBlockTypeEnum lastFormat = FormatBlockTypeEnum.None;
+    private async void MoveCursor(int blockIndex, int characterIndex, bool? cancelSelection = false)
+    {
+        if (cancelSelection == true)
+        {
+            Blocks.ForEach(b => b.FormatBlocks.ForEach(f => f.IsSelected = false));
+        }
 
-			var placeHolderFormatBlock = new FormatBlock { Content = "*" };
-			block.FormatBlocks.Add(placeHolderFormatBlock);
+        await inputBoxRef.FocusAsync();
+        _cursorIndex = new Tuple<int, int>(blockIndex, characterIndex);
+        StateHasChanged();
+    }
 
-			foreach (var character in block.FormatBlocks)
-			{
+    private void ConvertToHtml()
+    {
+        foreach (var block in Blocks)
+        {
+            html = "";
+            html += $"<p>";
+            FormatBlockTypeEnum lastFormat = FormatBlockTypeEnum.None;
 
-				if ((lastFormat & FormatBlockTypeEnum.I) == 0 && (character.Format & FormatBlockTypeEnum.I) != 0)
-				{
-					html += $"<i>";
-				}
-				if ((lastFormat & FormatBlockTypeEnum.U) == 0 && (character.Format & FormatBlockTypeEnum.U) != 0)
-				{
-					html += $"<u>";
-				}
-				if ((lastFormat & FormatBlockTypeEnum.B) == 0 && (character.Format & FormatBlockTypeEnum.B) != 0)
-				{
-					html += $"<b>";
-				}
-				if ((lastFormat & FormatBlockTypeEnum.B) != 0 && ((character.Format & FormatBlockTypeEnum.B) == 0))
-				{
-					html += $"</b>";
-				}
-				if ((lastFormat & FormatBlockTypeEnum.U) != 0 && ((character.Format & FormatBlockTypeEnum.U) == 0))
-				{
-					html += $"</u>";
-				}
-				if ((lastFormat & FormatBlockTypeEnum.I) != 0 && ((character.Format & FormatBlockTypeEnum.I) == 0))
-				{
-					html += $"</i>";
-				}
+            var placeHolderFormatBlock = new FormatBlock("*");
+            block.FormatBlocks.Add(placeHolderFormatBlock);
 
-				if(character != placeHolderFormatBlock)
-				{
-					html += $"{character.Content}";
-				}
+            foreach (var character in block.FormatBlocks)
+            {
 
-				lastFormat = character.Format;
-			}
+                if ((lastFormat & FormatBlockTypeEnum.I) == 0 && (character.Format & FormatBlockTypeEnum.I) != 0)
+                {
+                    html += $"<i>";
+                }
+                if ((lastFormat & FormatBlockTypeEnum.U) == 0 && (character.Format & FormatBlockTypeEnum.U) != 0)
+                {
+                    html += $"<u>";
+                }
+                if ((lastFormat & FormatBlockTypeEnum.B) == 0 && (character.Format & FormatBlockTypeEnum.B) != 0)
+                {
+                    html += $"<b>";
+                }
+                if ((lastFormat & FormatBlockTypeEnum.B) != 0 && ((character.Format & FormatBlockTypeEnum.B) == 0))
+                {
+                    html += $"</b>";
+                }
+                if ((lastFormat & FormatBlockTypeEnum.U) != 0 && ((character.Format & FormatBlockTypeEnum.U) == 0))
+                {
+                    html += $"</u>";
+                }
+                if ((lastFormat & FormatBlockTypeEnum.I) != 0 && ((character.Format & FormatBlockTypeEnum.I) == 0))
+                {
+                    html += $"</i>";
+                }
 
-			block.FormatBlocks.Remove(placeHolderFormatBlock);
+                if (character != placeHolderFormatBlock)
+                {
+                    html += $"{character.Content}";
+                }
 
-			html += $"</p>";
-		}
-	}
-}
+                lastFormat = character.Format;
+            }
+
+            block.FormatBlocks.Remove(placeHolderFormatBlock);
+
+            html += $"</p>";
+        }
+    }
+} *@
