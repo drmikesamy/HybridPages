@@ -5,22 +5,31 @@
 @using System.Text.Json;
 @inject PageService _pageService;
 @page "/rte"
-<div tabindex="0" style="background-color: white" @onkeydown="KeyDown" @ref="inputBoxRef" class="rich-text-editor-container" @onmousedown:preventDefault @onmouseup="SelectionEnd" @onpointerleave="SelectionEnd" @onmouseup:preventDefault>
+<div tabindex="0" style="background-color: white" @onkeydown="KeyDown" @ref="inputBoxRef" class="rich-text-editor-container" @onmousedown:preventDefault @onmouseup="SelectionEnd" @onpointerleave="SelectionEnd" @onmouseup:preventDefault @onblur="LostFocus">
 	@{
 		_blockIndex = 0;
 	}
 	@foreach (var block in Blocks)
 	{
 		int b = _blockIndex;
-		_characterIndex = 0;
+		_characterIndex = -1;
 		<div>
-			@foreach (var character in block.FormatBlocks)
+			@for (var c = -1; c < block.FormatBlocks.Count(); c++)
 			{
 				int i = _characterIndex;
 				<span class="text-cursor-shift @(_characterSelection.IsSelected(b, i) ? "selection-highlight" : "")" @onclick:stopPropagation="true" @onmousedown="() => SelectionStart(b, i)" @onmouseenter="() => SelectionAdd(b, i)" @onmouseup="SelectionEnd" @onmousedown:preventDefault @onmouseup:preventDefault>
-					@character.Content
+					@if(i == -1)
+					{
+						<span style="opacity: 0">
+							@("-")
+						</span>
+					}
+					else
+					{
+						@Blocks[b].FormatBlocks[i].Content;
+					}
 				</span>
-				if (b == _characterSelection.CursorBlock && i == _characterSelection.CursorChar)
+				if (_focused && b == _characterSelection.CursorBlock && i == _characterSelection.CursorChar)
 				{
 					<div class="text-cursor"></div>
 				}
@@ -29,6 +38,9 @@
 		</div>
 		_blockIndex++;
 	}
+</div>
+<div style="background-color: white">
+@_focused # @_characterSelection.CursorBlock # @_characterSelection.CursorChar
 </div>
 <div style="background-color: white">
 	<pre>
@@ -52,6 +64,7 @@
 	private CharacterSelection _characterSelection { get; set; }
 
 	private string _alphaNumericCharacterPattern = "^[a-zA-Z0-9.,@£$%!?&*^()\\[\\]\\/{} ]$";
+	private bool _focused = false;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -104,7 +117,7 @@
 
 	private async Task SelectionStart(int block, int index)
 	{
-		inputBoxRef.FocusAsync();
+		Focus();
 		isMouseDown = true;
 		_characterSelection.SetCursorPos(block, index);
 	}
@@ -120,5 +133,14 @@
 	{
 		isMouseDown = false;
 
+	}
+	public void Focus()
+	{
+		inputBoxRef.FocusAsync();
+		_focused = true;
+	}
+	public void LostFocus()
+	{
+		_focused = false;
 	}
 }
