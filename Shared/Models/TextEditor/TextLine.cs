@@ -43,13 +43,20 @@ namespace HybridPages.Shared.Models.TextEditor
 				EndBlock = Math.Max(AnchorBlock, _cursorBlock);
 			}
 		}
-		public int CursorChar {
+		public int CursorChar
+		{
 			get { return _cursorChar; }
 			set
 			{
 				_cursorChar = value;
-				StartChar = Math.Min(AnchorChar, _cursorChar);
-				EndChar = Math.Max(AnchorChar, _cursorChar);
+				if(CursorBlock == StartBlock)
+				{
+					StartChar = Math.Min(AnchorChar, _cursorChar);
+				}
+				if(CursorBlock == EndBlock)
+				{
+					EndChar = Math.Max(AnchorChar, _cursorChar);
+				}
 			}
 		}
 		public void SetCursorPos(int blockIndex, int charIndex)
@@ -61,7 +68,13 @@ namespace HybridPages.Shared.Models.TextEditor
 		}
 		public bool IsSelected(int blockIndex, int charIndex)
 		{
-			if((blockIndex > StartBlock && blockIndex < EndBlock) || (blockIndex == StartBlock && EndBlock > StartBlock && charIndex > StartChar) || (blockIndex == EndBlock && EndBlock > StartBlock && charIndex <= EndChar) || (StartBlock == EndBlock && charIndex <= EndChar && charIndex > StartChar)) return true;
+			if ((blockIndex > StartBlock && blockIndex < EndBlock)
+			|| (blockIndex == StartBlock && EndBlock > StartBlock && charIndex > StartChar)
+			|| (blockIndex == EndBlock && EndBlock > StartBlock && charIndex <= EndChar)
+			|| (StartBlock == EndBlock && blockIndex == EndBlock && charIndex <= EndChar && charIndex > StartChar))
+			{
+				return true;
+			}
 			return false;
 		}
 	}

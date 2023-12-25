@@ -40,7 +40,15 @@
 	}
 </div>
 <div style="background-color: white">
-@_focused # @_characterSelection.CursorBlock # @_characterSelection.CursorChar
+	<p>Focused: @_focused</p>
+	<p>AnchorBlock: @_characterSelection.AnchorBlock</p>
+	<p>AnchorChar: @_characterSelection.AnchorChar</p>
+	<p>CursorBlock: @_characterSelection.CursorBlock</p>
+	<p>CursorChar: @_characterSelection.CursorChar</p>
+	<p>StartBlock: @_characterSelection.StartBlock</p>
+	<p>StartChar: @_characterSelection.StartChar</p>
+	<p>EndBlock: @_characterSelection.EndBlock</p>
+	<p>EndChar: @_characterSelection.EndChar</p>
 </div>
 <div style="background-color: white">
 	<pre>
@@ -85,11 +93,25 @@
 				break;
 			case bool _ when e.Key == "Enter":
 				DeleteSelection();
-				Blocks.Insert(_characterSelection.StartBlock + 1, new Block());
+				var newBlock = new Block();
+				Blocks.Insert(_characterSelection.StartBlock + 1, newBlock);
+				var charsToMove = Blocks[_characterSelection.StartBlock].FormatBlocks.Where(fb => Blocks[_characterSelection.StartBlock].FormatBlocks.IndexOf(fb) > _characterSelection.StartChar);
+				Blocks[_characterSelection.StartBlock + 1].FormatBlocks.AddRange(charsToMove);
+				Blocks[_characterSelection.StartBlock].FormatBlocks.RemoveAll(fb => charsToMove.Contains(fb));
 				_characterSelection.SetCursorPos(_characterSelection.StartBlock + 1, -1);
 				StateHasChanged();
 				break;
 			case bool _ when e.Key == "Backspace":
+				if(_characterSelection.CursorChar == -1)
+				{
+					if (_characterSelection.CursorBlock > 0)
+					{
+						_characterSelection.SetCursorPos(_characterSelection.CursorBlock - 1, Blocks[_characterSelection.CursorBlock - 1].FormatBlocks.Count() - 1);
+					}
+					break;
+				}
+				_characterSelection.StartBlock = _characterSelection.CursorBlock;
+				_characterSelection.StartChar = _characterSelection.CursorChar - 1;
 				DeleteSelection();
 				break;
 		}
@@ -142,5 +164,6 @@
 	public void LostFocus()
 	{
 		_focused = false;
+		_characterSelection.SetCursorPos(_blockIndex, 0);
 	}
 }
