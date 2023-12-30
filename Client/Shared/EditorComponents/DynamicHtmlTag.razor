@@ -3,17 +3,17 @@
 @switch (HtmlTag)
 {
 	case TextLineTypeEnum.H1:
-		<h1 class="@CssClasses">
+		<h1>
 			@ChildContent
 		</h1>
 		break;
 	case TextLineTypeEnum.H2:
-		<h2 class="@CssClasses">
+		<h2>
 			@ChildContent
 		</h2>
 		break;
 	case TextLineTypeEnum.P:
-		<p class="@CssClasses">
+		<p>
 			@ChildContent
 		</p>
 		break;
@@ -26,5 +26,5 @@
 	[Parameter]
 	public string CssClasses { get; set; } = "";
 	[Parameter]
-	public TextLineTypeEnum HtmlTag { get; set; }
+	public TextLineTypeEnum HtmlTag { get; set; } = TextLineTypeEnum.P;
 }

@@ -49,14 +49,23 @@ namespace HybridPages.Shared.Models.TextEditor
 			set
 			{
 				_cursorChar = value;
-				if(CursorBlock == StartBlock)
+				if (AnchorBlock != CursorBlock)
+				{
+					if (CursorBlock == StartBlock)
+					{
+						StartChar = _cursorChar;
+					}
+					if (CursorBlock == EndBlock)
+					{
+						EndChar = _cursorChar;
+					}
+				}
+				else
 				{
 					StartChar = Math.Min(AnchorChar, _cursorChar);
-				}
-				if(CursorBlock == EndBlock)
-				{
 					EndChar = Math.Max(AnchorChar, _cursorChar);
 				}
+
 			}
 		}
 		public void SetCursorPos(int blockIndex, int charIndex)
