@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Pages</title>
+    <HeadOutlet @rendermode="new InteractiveWebAssemblyRenderMode(prerender: false)" />
     <base href="/" />
     <link href="css/app.css" rel="stylesheet" />
     <link rel="icon" type="image/png" href="favicon.png" />
@@ -14,11 +14,9 @@
 </head>
 
 <body>
-    <div id="app">
-
-    </div>
+    <Routes @rendermode="new InteractiveWebAssemblyRenderMode(prerender: false)" />
     <script src="_content/Microsoft.AspNetCore.Components.WebAssembly.Authentication/AuthenticationService.js"></script>
-    <script src="_framework/blazor.webassembly.js"></script>
+    <script src="_framework/blazor.web.js"></script>
     <script src="js/domelements.js"></script>
     <script>navigator.serviceWorker.register('service-worker.js');</script>
 </body>

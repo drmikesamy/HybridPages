@@ -5,6 +5,7 @@ using HybridPages.Server.Data;
 using HybridPages.Server.Models;
 using AutoMapper;
 using System.Reflection;
+using HybridPages.Server;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +32,8 @@ builder.Services.AddAuthentication()
     .AddIdentityServerJwt();
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddRazorComponents()
+    .AddInteractiveWebAssemblyComponents();
 builder.Services.AddRazorPages();
 builder.Services.AddSwaggerGen();
 
@@ -65,10 +68,9 @@ else
 
 app.UseHttpsRedirection();
 
-app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 
-app.UseRouting();
+app.UseAntiforgery();
 
 app.UseIdentityServer();
 app.UseAuthorization();
@@ -85,6 +87,8 @@ app.UseCors("CorsAllowAll");
 
 app.MapRazorPages();
 app.MapControllers();
-app.MapFallbackToFile("index.html");
+app.MapRazorComponents<App>()
+    .AddInteractiveWebAssemblyRenderMode()
+    .AddAdditionalAssemblies(typeof(HybridPages.Client._Imports).Assembly);
 
 app.Run();

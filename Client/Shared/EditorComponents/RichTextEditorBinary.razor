@@ -8,9 +8,9 @@
 <button class="@(bold ? "format-button-selected" : "")" @onclick="@(() => FormatItem(FormatBlockTypeEnum.B))">B</button>
 <button class="@(italic ? "format-button-selected" : "")" @onclick="@(() => FormatItem(FormatBlockTypeEnum.I))"><i>I</i></button>
 <button class="@(underline ? "format-button-selected" : "")" @onclick="@(() => FormatItem(FormatBlockTypeEnum.U))"><u>U</u></button>
-<button class="@(Blocks[_characterSelection.CursorBlock].BlockType == TextLineTypeEnum.H1 ? "format-button-selected" : "")" @onclick="@(() => Blocks[_characterSelection.CursorBlock].BlockType = TextLineTypeEnum.H1)">H1</button>
-<button class="@(Blocks[_characterSelection.CursorBlock].BlockType == TextLineTypeEnum.H2 ? "format-button-selected" : "")" @onclick="@(() => Blocks[_characterSelection.CursorBlock].BlockType = TextLineTypeEnum.H2)">H2</button>
-<button class="@(Blocks[_characterSelection.CursorBlock].BlockType == TextLineTypeEnum.P ? "format-button-selected" : "")" @onclick="@(() => Blocks[_characterSelection.CursorBlock].BlockType = TextLineTypeEnum.P)">P</button>
+<button class="@(Blocks[_characterSelection.CursorBlock].BlockType == TextLineTypeEnum.H1 ? "format-button-selected" : "")" @onclick="@(() => SetBlockType(TextLineTypeEnum.H1))">H1</button>
+<button class="@(Blocks[_characterSelection.CursorBlock].BlockType == TextLineTypeEnum.H2 ? "format-button-selected" : "")" @onclick="@(() => SetBlockType(TextLineTypeEnum.H2))">H2</button>
+<button class="@(Blocks[_characterSelection.CursorBlock].BlockType == TextLineTypeEnum.P ? "format-button-selected" : "")" @onclick="@(() => SetBlockType(TextLineTypeEnum.P))">P</button>
 <button @onclick="ConvertToHtml">HTML</button>
 <div tabindex="0" style="background-color: white" @onkeydown="KeyDown" @ref="inputBoxRef" class="rich-text-editor-container" @onmousedown:preventDefault @onmouseup="SelectionEnd" @onpointerleave="SelectionEnd" @onmouseup:preventDefault @onblur="LostFocus">
 	@{
@@ -21,45 +21,47 @@
 	{
 		int b = _blockIndex;
 		int charCount = block.FormatBlocks.Count();
-		_characterIndex = 0;
-		<div>
-			@if(charCount == 0)
-			{
-				<span style="opacity: 0">
+		<div @onmouseup="() => _characterSelection.SetCursorPos(b, charCount - 1)" @onmouseup:stopPropagation="true" @onmouseup:preventDefault="true" class="text-line">
+			<DynamicHtmlTag HtmlTag="block.BlockType">
+				<span style="opacity: 0" @onmouseup="() => _characterSelection.SetCursorPos(b, -1)" @onmouseup:stopPropagation="true" @onmouseup:preventDefault="true">
 					-
 				</span>
-			}
-			else
-			{
-				@for (var c = 0; c < charCount; c++)
+				@if (_focused && b == _characterSelection.CursorBlock && _characterSelection.CursorChar == -1)
 				{
-					int i = _characterIndex;
-					<span class="text-cursor-shift @(_characterSelection.IsSelected(b, i) ? "selection-highlight" : "")" @onclick:stopPropagation="true" @onmousedown="() => SelectionStart(b, i)" @onmouseenter="() => SelectionAdd(b, i)" @onmouseup="SelectionEnd" @onmousedown:preventDefault @onmouseup:preventDefault>
+					<div class="text-cursor"></div>
+				}
+				@{
+					int characterIndex = 0;
+				}
+				@foreach (var character in block.FormatBlocks)
+				{
+					int i = characterIndex;
+					<span class="text-cursor-shift @(_characterSelection.IsSelected(b, i) ? "selection-highlight" : "")" @onmousedown="() => SelectionStart(b, i)" @onmouseenter="() => SelectionAdd(b, i)" @onmouseup="SelectionEnd" @onmouseup:stopPropagation="true" @onmousedown:preventDefault @onmouseup:preventDefault>
 						@switch (Blocks[b].FormatBlocks[i].Format)
 						{
 							case FormatBlockTypeEnum.None:
-								@Blocks[b].FormatBlocks[i].Content
+								@character.Content
 								break;
 							case FormatBlockTypeEnum.I:
-								<i>@Blocks[b].FormatBlocks[i].Content</i>
+								<i>@character.Content</i>
 								break;
 							case FormatBlockTypeEnum.B:
-								<b>@Blocks[b].FormatBlocks[i].Content</b>
+								<b>@character.Content</b>
 								break;
 							case FormatBlockTypeEnum.U:
-								<u>@Blocks[b].FormatBlocks[i].Content</u>
+								<u>@character.Content</u>
 								break;
 							case FormatBlockTypeEnum.I | FormatBlockTypeEnum.U:
-								<i><u>@Blocks[b].FormatBlocks[i].Content</u></i>
+								<i><u>@character.Content</u></i>
 								break;
 							case FormatBlockTypeEnum.B | FormatBlockTypeEnum.U:
-								<b><u>@Blocks[b].FormatBlocks[i].Content</u></b>
+								<b><u>@character.Content</u></b>
 								break;
 							case FormatBlockTypeEnum.I | FormatBlockTypeEnum.B:
-								<i><b>@Blocks[b].FormatBlocks[i].Content</b></i>
+								<i><b>@character.Content</b></i>
 								break;
 							case FormatBlockTypeEnum.I | FormatBlockTypeEnum.B | FormatBlockTypeEnum.U:
-								<i><b><u>@Blocks[b].FormatBlocks[i].Content</u></b></i>
+								<i><b><u>@character.Content</u></b></i>
 								break;
 						}
 					</span>
@@ -67,11 +69,11 @@
 					{
 						<div class="text-cursor"></div>
 					}
-					_characterIndex++;
+					characterIndex++;
 				}
-			}
+			</DynamicHtmlTag>
 		</div>
-		@if(b < blockCount - 1)
+		@if (b < blockCount - 1)
 		{
 			_blockIndex++;
 		}
@@ -94,14 +96,13 @@
 	<pre>
 		@(JsonSerializer.Serialize(Blocks, new JsonSerializerOptions() { WriteIndented = true }))
 	</pre>
-</div>
- *@
+</div> *@
+
 
 @code {
 	public List<Block> Blocks { get; set; } = new List<Block>();
 
 	private int _blockIndex { get; set; }
-	private int _characterIndex { get; set; }
 
 	private ElementReference inputBoxRef { get; set; }
 
@@ -147,7 +148,7 @@
 				_characterSelection.SetCursorPos(_characterSelection.StartBlock + 1, -1);
 				break;
 			case bool _ when e.Key == "Backspace":
-				if(_characterSelection.CursorChar == 0)
+				if (_characterSelection.CursorChar < 0)
 				{
 					if (_characterSelection.CursorBlock > 0)
 					{
@@ -163,7 +164,7 @@
 				DeleteSelection();
 				break;
 			case bool _ when e.Key == "ArrowLeft":
-				if (_characterSelection.CursorChar == 0)
+				if (_characterSelection.CursorChar < 0)
 				{
 					if (_characterSelection.CursorBlock > 0)
 					{
@@ -299,12 +300,21 @@
 		}
 		StateHasChanged();
 	}
+
+	private void SetBlockType(TextLineTypeEnum blockType)
+	{
+		Focus();
+		_characterSelection = JsonSerializer.Deserialize<CharacterSelection>(JsonSerializer.Serialize(_lastCharacterSelection));
+		Blocks[_characterSelection.CursorBlock].BlockType = blockType;
+		StateHasChanged();
+	}
+
 	private void ConvertToHtml()
 	{
 		html = "";
 		foreach (var block in Blocks)
 		{
-			html += $"<p>";
+			html += $"<{block.BlockType.ToString().ToLower()}>";
 			FormatBlockTypeEnum lastFormat = FormatBlockTypeEnum.None;
 
 			var placeHolderFormatBlock = new FormatBlock("*");
@@ -348,7 +358,7 @@
 
 			block.FormatBlocks.Remove(placeHolderFormatBlock);
 
-			html += $"</p>";
+			html += $"</{block.BlockType.ToString().ToLower()}>";
 		}
 	}
 }
