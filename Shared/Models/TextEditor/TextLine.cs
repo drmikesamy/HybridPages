@@ -75,6 +75,7 @@ namespace HybridPages.Shared.Models.TextEditor
 			CursorBlock = blockIndex;
 			CursorChar = charIndex;
 		}
+		public bool NoActiveSelection => AnchorBlock == CursorBlock && AnchorChar == CursorChar;
 		public bool IsSelected(int blockIndex, int charIndex)
 		{
 			if ((blockIndex > StartBlock && blockIndex < EndBlock)

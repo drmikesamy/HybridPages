@@ -35,13 +35,9 @@
 							<input type="text" @bind-value="Content" @bind-value:event="oninput" />
 							break;
 						default:
-							@for(var i = 0; i < _pageService.SelectedPost.ContentTextLines.Count(); i++)
-							{
-								<RecursiveLongFormEditor TextLine="_pageService.SelectedPost.ContentTextLines.ElementAt(i)"></RecursiveLongFormEditor>
-							}
+							<RichTextEditor @bind-JsonContent="Content"></RichTextEditor>
 							break;
 					}
-
 					<hr>
 					
 					@if (_pageService.SelectedPost?.Id != _pageService.Page?.Posts?.First?.Value.Id)
