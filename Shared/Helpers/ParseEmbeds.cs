@@ -1,5 +1,4 @@
-﻿using HybridPages.Shared.Enums;
-using HybridPages.Shared.Models.TextEditor;
+﻿
 using Microsoft.AspNetCore.Components;
 using System.Web;
 
@@ -33,20 +32,6 @@ namespace HybridPages.Shared.Helpers
 			}
 
 			return (MarkupString)"""<div class="error"><p>Invalid Video URL</p></div>""";
-		}
-		public static MarkupString ParseLongformContent(List<TextLine> textLines)
-		{
-			var markUp = string.Empty;
-
-			foreach (var textLine in textLines)
-			{
-				var tag = textLine.TextLineType.ToString();
-				markUp += $"<{tag}>{textLine.Content}";
-				markUp += ParseLongformContent(textLine.ChildTextLines);
-				markUp += $"</{tag}>";
-			}
-
-			return (MarkupString)markUp;
 		}
 
 		public static MarkupString StringAsMarkup(string text)

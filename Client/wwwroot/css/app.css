@@ -31,29 +31,32 @@ input:focus {
   outline: none;
 }
 
-html {
-  font-size: 12px;
-  color: black;
+h1 {
+  font-size: calc(1.6rem + 0.5vw);
 }
-@media only screen and (min-width: 320px) {
-  html {
-    font-size: 0.8rem;
-  }
+
+h2 {
+  font-size: calc(1.2rem + 0.5vw);
 }
-@media only screen and (min-width: 481px) {
-  html {
-    font-size: 0.9rem;
-  }
+
+h3 {
+  font-size: calc(1.1rem + 0.5vw);
 }
-@media only screen and (min-width: 1025px) {
-  html {
-    font-size: 1rem;
-  }
+
+h4 {
+  font-size: calc(0.6rem + 0.5vw);
 }
-@media only screen and (min-width: 1201px) {
-  html {
-    font-size: 1.1rem;
-  }
+
+h5 {
+  font-size: calc(0.4rem + 0.5vw);
+}
+
+h6 {
+  font-size: calc(0.2rem + 0.5vw);
+}
+
+p {
+  font-size: calc(0.9rem + 0.5vw);
 }
 
 @font-face {
@@ -75,6 +78,7 @@ h6 {
 }
 
 p {
+  font-family: "Arsenal";
   color: black;
 }
 
@@ -86,10 +90,6 @@ h2.layout-element {
 
 .colour-invert {
   color: white;
-}
-
-p {
-  font-family: "Open Sans";
 }
 
 a:link {
@@ -355,49 +355,6 @@ body {
   bottom: 250px;
   right: 10px;
   width: 100px;
-}
-
-.text-cursor {
-  display: inline-block;
-  width: 1px;
-  margin-left: -1px;
-  height: 1.3rem;
-  margin-bottom: -0.2rem;
-  background-color: black;
-  animation: cursor-blink 1s steps(1) infinite;
-  opacity: 0;
-}
-
-.rich-text-editor-container {
-  padding: 0.5rem;
-  background-color: white;
-}
-
-@keyframes cursor-blink {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-.selection-highlight {
-  background-color: greenyellow;
-}
-
-.format-button-selected {
-  background-color: grey;
-}
-
-p {
-  min-height: 2rem;
-}
-
-.text-line {
-  cursor: text;
 }
 
 nav.primary-nav {

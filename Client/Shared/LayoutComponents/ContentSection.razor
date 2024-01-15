@@ -3,6 +3,7 @@
 @using HybridPages.Shared.Enums;
 @using HybridPages.Shared.Helpers;
 @using HybridPages.Shared.Models;
+@using SimpleTextEditor.Helpers
 @inject PageService _pageService;
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
@@ -25,7 +26,7 @@
 				break;
 			default:
 				<article class="card">
-					@ParseEmbeds.ParseLongformContent(post.ContentTextLines)
+					@((MarkupString)post.HtmlContent)
 				</article>
 				break;
 		}
@@ -37,17 +38,4 @@
 	<SectionEditor></SectionEditor>
 }
 
-@code {
-	private bool _editable = false;
-	private Task<AuthenticationState> _authenticationStateTask { get; set; }
 
-	[Parameter]
-	public Post post { get; set; } = new Post { Title = "Your title here", Content = "This is your tagline" };
-	protected override async Task OnInitializedAsync()
-	{
-		_pageService.OnStateChange += StateHasChanged;
-		var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-		var user = authenticationState.User;
-		_editable = user.Identity != null && user.Identity.IsAuthenticated;
-	}
-}

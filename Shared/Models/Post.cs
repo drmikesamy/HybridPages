@@ -1,5 +1,6 @@
 ﻿using HybridPages.Shared.Enums;
-using HybridPages.Shared.Models.TextEditor;
+using SimpleTextEditor.Helpers;
+using SimpleTextEditor.Models;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HybridPages.Shared.Models
@@ -9,16 +10,15 @@ namespace HybridPages.Shared.Models
         public long PageId { get; set; }
 		public string Title { get; set; } = "Title";
         public string Content { get; set; } = "Content";
+        public string HtmlContent => TextBlocks.ToHtml();
+		[NotMapped]
+		public List<SimpleTextBlock> TextBlocks { get; set; } = new List<SimpleTextBlock> { new SimpleTextBlock { Characters = new List<SimpleTextCharacter> { new SimpleTextCharacter() } } };
 		public PostTypeEnum Type { get; set; } = PostTypeEnum.Text;
 		public Style? Style { get; set; }
 		public virtual ICollection<PostMeta> PostMeta { get; set; }
-		[NotMapped]
-		public List<TextLine> ContentTextLines { get; set; }
 		public Post()
 		{
 			PostMeta = new HashSet<PostMeta>();
-			ContentTextLines = new List<TextLine>();
-			ContentTextLines.Add(new TextLine());
 		}
 	}
 }

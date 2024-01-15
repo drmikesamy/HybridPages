@@ -3,6 +3,7 @@
 @using HybridPages.Shared.Interfaces;
 @using HybridPages.Shared.Models;
 @using HybridPages.Shared.Helpers;
+@using SimpleTextEditor;
 @inject PageService _pageService;
 
 @if (_pageService.SelectedPost != null)
@@ -35,9 +36,10 @@
 							<input type="text" @bind-value="Content" @bind-value:event="oninput" />
 							break;
 						default:
-							<RichTextEditor @bind-JsonContent="Content"></RichTextEditor>
+							<TextEditor @bind-Blocks="TextBlocks"></TextEditor>
 							break;
 					}
+					<br /><br />
 					<hr>
 					
 					@if (_pageService.SelectedPost?.Id != _pageService.Page?.Posts?.First?.Value.Id)
@@ -53,41 +55,4 @@
 			</section>
 		</Authorized>
 	</AuthorizeView>
-}
-
-@code {
-	protected override async Task OnInitializedAsync()
-	{
-		_pageService.OnStateChange += StateHasChanged;
-	}
-	public string Title
-	{
-		get
-		{
-			return _pageService.SelectedPost?.Title ?? "Title";
-		}
-		set
-		{
-			if (_pageService.SelectedPost != null)
-			{
-				_pageService.SelectedPost.Title = value;
-				_pageService.NotifyStateChanged();
-			}
-		}
-	}
-	public string Content
-	{
-		get
-		{
-			return _pageService.SelectedPost?.Content ?? "Content";
-		}
-		set
-		{
-			if (_pageService.SelectedPost != null)
-			{
-				_pageService.SelectedPost.Content = value;
-				_pageService.NotifyStateChanged();
-			}
-		}
-	}
 }

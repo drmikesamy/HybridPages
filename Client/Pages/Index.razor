@@ -1,5 +1,5 @@
 ﻿@page "/"
-@page "/{UniqueName}"
+@page "/p/{UniqueName}"
 @using System.Text.RegularExpressions;
 @using HybridPages.Client.Shared.EditorComponents
 @using HybridPages.Client.Shared.LayoutComponents
@@ -54,7 +54,7 @@
 		}
 		else
 		{
-			Navigation.NavigateTo("/start", forceLoad: true);
+			Navigation.NavigateTo("/p/start", forceLoad: true);
 		}
 	}
 
