@@ -4,6 +4,7 @@
 @using HybridPages.Shared.Models;
 @using HybridPages.Shared.Helpers;
 @using SimpleTextEditor;
+@using HybridPages.Client.Shared.EditorComponents.Forms;
 @inject PageService _pageService;
 
 @if (_pageService.SelectedPost != null)
@@ -16,6 +17,7 @@
 					<li><a class="@(_pageService.SelectedPost.Type == PostTypeEnum.Text ? "active" : "")" @onclick="() => _pageService.SetPostType(PostTypeEnum.Text)">Text</a></li>
 					<li><a class="@(_pageService.SelectedPost.Type == PostTypeEnum.Image ? "active" : "")" @onclick="() => _pageService.SetPostType(PostTypeEnum.Image)">Image</a></li>
 					<li><a class="@(_pageService.SelectedPost.Type == PostTypeEnum.YouTube ? "active" : "")" @onclick="() => _pageService.SetPostType(PostTypeEnum.YouTube)">Video</a></li>
+					<li><a class="@(_pageService.SelectedPost.Type == PostTypeEnum.Form ? "active" : "")" @onclick="() => _pageService.SetPostType(PostTypeEnum.Form)">Form</a></li>
 				</ul>
 			</nav>
 			<section class="section-editor">
@@ -34,6 +36,9 @@
 						case PostTypeEnum.YouTube:
 							<div>URL:</div>
 							<input type="text" @bind-value="Content" @bind-value:event="oninput" />
+							break;
+						case PostTypeEnum.Form:
+							<FormEditor></FormEditor>
 							break;
 						default:
 							<TextEditor @bind-Blocks="TextBlocks"></TextEditor>

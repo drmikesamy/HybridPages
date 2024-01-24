@@ -5,14 +5,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HybridPages.Shared.Models
 {
-    public class Post : BaseEntity<Post>
+    public class Post<T> : BaseEntity<Post<T>>
     {
         public long PageId { get; set; }
 		public string Title { get; set; } = "Title";
         public string Content { get; set; } = "Content";
-        public string HtmlContent => TextBlocks.ToHtml();
 		[NotMapped]
-		public List<SimpleTextBlock> TextBlocks { get; set; } = new List<SimpleTextBlock> { new SimpleTextBlock { Characters = new List<SimpleTextCharacter> { new SimpleTextCharacter() } } };
+		public List<T> PostObject { get; set; } = new();
 		public PostTypeEnum Type { get; set; } = PostTypeEnum.Text;
 		public Style? Style { get; set; }
 		public virtual ICollection<PostMeta> PostMeta { get; set; }

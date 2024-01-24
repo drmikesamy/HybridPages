@@ -5,7 +5,7 @@ namespace HybridPages.Shared.Models.Forms
 {
 	public class InputFieldAttribute : BaseEntity<InputFieldAttribute>
 	{
-		public InputFieldAttributeType InputFieldAttributeType { get; set; } = new();
+		public InputFieldAttributeEnum InputFieldAttributeType { get; set; }
 		public InputFieldAttributeOptionEnum Value;
 		public string? StringValue;
 	}

@@ -1,0 +1,15 @@
+﻿@using HybridPages.Client.State
+@inject PageService _pageService;
+
+<h3>FormEditor</h3>
+
+Name: <input type="text" @bind-value="InputForm.Name" @bind-value:event="oninput" />
+Description: <input type="text" @bind-value="InputForm.Description" @bind-value:event="oninput" />
+
+<hr />
+
+@foreach(var field in InputForm.Fields)
+{
+	
+}
+<button @onclick="() => AddField()">Add Field</button>
