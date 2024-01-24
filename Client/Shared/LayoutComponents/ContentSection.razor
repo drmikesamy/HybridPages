@@ -24,6 +24,11 @@
 				@ParseEmbeds.ParseVideoUrl(post.Content)
 				</article>
 				break;
+			case PostTypeEnum.Link:
+				<article class="card">
+					<a href="@post.Content">@post.Title</a>
+				</article>
+				break;
 			default:
 				<article class="card">
 					@((MarkupString)post.HtmlContent)

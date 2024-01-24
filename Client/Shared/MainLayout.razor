@@ -16,7 +16,7 @@
 			<ul>
 				<AuthorizeView>
 					<Authorized>
-						<li><NavLink Match="NavLinkMatch.All" href="@("p/"+UniqueName+"/settings")">Page Settings</NavLink></li>
+						<li><NavLink Match="NavLinkMatch.All" href="@("settings/"+UniqueName)">Page Settings</NavLink></li>
 						<li><NavLink Match="NavLinkMatch.All" href="" @onclick="BeginLogOut">Log Out</NavLink></li>
 					</Authorized>
 					<NotAuthorized>

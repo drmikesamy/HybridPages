@@ -1,12 +1,20 @@
-﻿@page "/p/{UniqueName}/settings"
+﻿@page "/settings/{UniqueName}"
 @using HybridPages.Client.State;
 @inject PageService _pageService
-	<div>
-		SETTINGS PAGE
-	<NavLink Match="NavLinkMatch.All" href="@(UniqueName+"/backgrounddesigner")">Page Settings</NavLink>
+<div class="content-container">
+	<div class="content-container">
+		@if (_pageService.Page == null)
+		{
+			<article class="card">
+				<p><em>Loading...</em></p>
+			</article>
+		}
+		else
+		{
+			@foreach (var post in _pageService.Page.Posts)
+			{
+				<ContentSection post="@post"></ContentSection>
+			}
+		}
 	</div>
-
-@code {
-	[Parameter]
-	public string? UniqueName { get; set; }
-}
+</div>

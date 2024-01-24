@@ -17,6 +17,8 @@ namespace HybridPages.Shared.Enums
         Team = 7,
         Contact = 8,
         MailingList = 9,
-        Event = 10
+        Event = 10,
+        Link = 11,
+        Form = 12
     }
 }

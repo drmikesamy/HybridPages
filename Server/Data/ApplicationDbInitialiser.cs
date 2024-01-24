@@ -1,5 +1,6 @@
 ﻿using HybridPages.Server.Enums;
 using HybridPages.Server.Models;
+using HybridPages.Shared.Models.Forms.Types;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 

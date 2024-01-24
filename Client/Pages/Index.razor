@@ -12,55 +12,25 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using System.Text.Json;
-@inject NavigationManager Navigation
+@inject NavigationManager _navigation
 @inject PageService _pageService
 
-	<div class="content-container">
-		@if (_pageService.Page == null)
-		{
-			<article class="card">
-				<p><em>Loading...</em></p>
-			</article>
-		}
-		else
-		{
-			@foreach (var post in _pageService.Page.Posts)
-			{
-				<ContentSection post="@post"></ContentSection>
-			}
-		}
-	</div>
-
-
-@(JsonSerializer.Serialize(_pageService.Page, new JsonSerializerOptions() { WriteIndented = true }))
-
-@code {
-	[Parameter]
-	public string? UniqueName { get; set; }
-
-	protected override async Task OnInitializedAsync()
+<div class="content-container">
+	@if (_pageService.Page == null)
 	{
-		_pageService.OnStateChange += StateHasChanged;
-		if (UniqueName != null)
+		<article class="card">
+			<p><em>Loading...</em></p>
+		</article>
+	}
+	else
+	{
+		@foreach (var post in _pageService.Page.Posts)
 		{
-			try
-			{
-				await _pageService.Get(UniqueName);
-			}
-			catch (AccessTokenNotAvailableException exception)
-			{
-				exception.Redirect();
-			}
-		}
-		else
-		{
-			Navigation.NavigateTo("/p/start", forceLoad: true);
+			<ContentSection post="@post"></ContentSection>
 		}
 	}
+</div>
 
-	public void SelectPost(Post post)
-	{
-		_pageService.SelectedPost = post;
-		StateHasChanged();
-	}
-}
+
+@* @(JsonSerializer.Serialize(_pageService.Page, new JsonSerializerOptions() { WriteIndented = true })) *@
+
