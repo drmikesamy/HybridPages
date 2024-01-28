@@ -18,11 +18,11 @@ namespace HybridPages.Client.Shared.EditorComponents.Forms
 		}
 		public void AddField()
 		{
-			var field = new InputField
-			{
-				InputFieldType = _pageService.
-			};
-			InputForm.Fields.Add(field);
+			//var field = new InputField
+			//{
+			//	InputFieldType = _pageService.
+			//};
+			//InputForm.Fields.Add(field);
 		}
 	}
 }

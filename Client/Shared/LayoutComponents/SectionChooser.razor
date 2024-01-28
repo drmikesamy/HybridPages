@@ -1,0 +1,21 @@
+﻿@using HybridPages.Client.State;
+@using HybridPages.Shared.Enums;
+@using HybridPages.Shared.Interfaces;
+@using HybridPages.Shared.Models;
+@using HybridPages.Shared.Helpers;
+@using SimpleTextEditor;
+@using HybridPages.Client.Shared.EditorComponents.Forms;
+@inject PageService _pageService;
+
+@if (_pageService.SelectedPost != null)
+{
+	<AuthorizeView Context="authContext">
+		<Authorized>
+			<section>
+				<article class="card">
+					<button @onclick="() => _pageService.AddPost(PostTypeEnum.Text)">Add Text Section</button>
+				</article>
+			</section>
+		</Authorized>
+	</AuthorizeView>
+}
