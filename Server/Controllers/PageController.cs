@@ -50,7 +50,6 @@ namespace HybridPages.Server.Controllers
 				page.Posts.AddFirst(new Post
 				{
 					Type = PostTypeEnum.JumboBanner,
-					Title = "Your First Post",
 					Content = "Your Tagline Here"
 				});
 

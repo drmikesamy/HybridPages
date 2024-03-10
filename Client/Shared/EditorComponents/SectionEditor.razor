@@ -25,11 +25,9 @@
 					@switch (_pageService.SelectedPost?.Type)
 					{
 						case PostTypeEnum.JumboBanner:
-							<input type="text" @bind-value="Title" @bind-value:event="oninput" />
 							<input type="text" @bind-value="Content" @bind-value:event="oninput" />
 							break;
 						case PostTypeEnum.Image:
-							<input type="text" @bind-value="Title" @bind-value:event="oninput" />
 							<input type="text" @bind-value="Content" @bind-value:event="oninput" />
 							break;
 						case PostTypeEnum.Vimeo:

@@ -9,21 +9,6 @@ namespace HybridPages.Client.Shared.EditorComponents
 		{
 			_pageService.OnStateChange += StateHasChanged;
 		}
-		public string Title
-		{
-			get
-			{
-				return _pageService.SelectedPost?.Title ?? "Title";
-			}
-			set
-			{
-				if (_pageService.SelectedPost != null)
-				{
-					_pageService.SelectedPost.Title = value;
-					_pageService.NotifyStateChanged();
-				}
-			}
-		}
 		public string Content
 		{
 			get

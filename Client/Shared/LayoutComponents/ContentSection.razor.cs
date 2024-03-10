@@ -7,10 +7,8 @@ namespace HybridPages.Client.Shared.LayoutComponents
 	public partial class ContentSection
 	{
 		private bool _editable = false;
-		private Task<AuthenticationState> _authenticationStateTask { get; set; }
-
 		[Parameter]
-		public Post post { get; set; } = new Post { Title = "Your title here", Content = "This is your tagline" };
+		public Post post { get; set; } = new Post { Content = "" };
 		protected override async Task OnInitializedAsync()
 		{
 			_pageService.OnStateChange += StateHasChanged;

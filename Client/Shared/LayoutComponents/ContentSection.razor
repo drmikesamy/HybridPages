@@ -9,38 +9,9 @@
 
 @if (post != null)
 {
-	<section style="background-image:url('');" class="@(_editable && _pageService.SelectedPost != post ? "mouseover-border" : "") @(_pageService.SelectedPost == post ? "editing-border" : "")" @onclick="(() => _pageService.SelectPost(post))">
-		@switch (post.Type)
-		{
-			case PostTypeEnum.JumboBanner:
-				<article class="jumbo-banner">
-					<h1>@(post.Title != null && post.Title != "" ? post.Title : "Title")</h1>
-					<h5>@(post.Content != null && post.Content != "" ? post.Content : "Content")</h5>
-				</article>
-				break;
-			case PostTypeEnum.Vimeo:
-			case PostTypeEnum.YouTube:
-				<article class="card">
-				@ParseEmbeds.ParseVideoUrl(post.Content)
-				</article>
-				break;
-			case PostTypeEnum.Link:
-				<article class="card">
-					<a href="@post.Content">@post.Title</a>
-				</article>
-				break;
-			default:
-				<article class="card">
-					@((MarkupString)post.HtmlContent)
-				</article>
-				break;
-		}
+	<section class="@(_editable && _pageService.SelectedPost != post ? "mouseover-border" : "") @(_pageService.SelectedPost == post ? "editing-border" : "")" @onclick="(() => _pageService.SelectPost(post))">
+		<article class="card">
+			@((MarkupString)post.TextBlocks.ToHtml())
+		</article>
 	</section>
-
 }
-@if (_pageService.SelectedPost == post)
-{
-	<SectionEditor></SectionEditor>
-}
-
-
