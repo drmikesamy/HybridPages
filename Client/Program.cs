@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using HybridPages.Client;
 using HybridPages.Shared.Helpers;
 using HybridPages.Client.State;
+using Plk.Blazor.DragDrop;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -18,5 +19,6 @@ builder.Services.AddApiAuthorization();
 builder.Services.AddScoped<DOMElements>();
 
 builder.Services.AddScoped<PageService>();
+builder.Services.AddBlazorDragDrop();
 
 await builder.Build().RunAsync();

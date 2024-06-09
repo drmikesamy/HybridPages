@@ -3,15 +3,67 @@
 @using HybridPages.Shared.Enums;
 @using HybridPages.Shared.Helpers;
 @using HybridPages.Shared.Models;
-@using SimpleTextEditor.Helpers
+@using Blazored.TextEditor;
 @inject PageService _pageService;
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-@if (post != null)
+@if (postGroup != null)
 {
-	<section class="@(_editable && _pageService.SelectedPost != post ? "mouseover-border" : "") @(_pageService.SelectedPost == post ? "editing-border" : "")" @onclick="(() => _pageService.SelectPost(post))">
-		<article class="card">
-			@((MarkupString)post.TextBlocks.ToHtml())
-		</article>
+
+	@if (_pageService.DragDropTarget?.ChainedRow == postGroup.First().ChainedRow)
+	{
+		<section>
+			<article>
+				spacer
+			</article>
+		</section>
+	}
+	<section>
+		@foreach (var post in postGroup)
+		{
+			<article class="@(post.Type.ToString().ToKebabCase())"
+					 draggable="true"
+					 @ondragstart="@(() => DragStart(post))"
+					 @ondragenter="() => DragEnter(post)"
+					 @ondrop="() => Drop()"
+					 @ondragleave="() => DragLeave()">
+				<div style="pointer-events:none">
+					<span class="oi oi-grid-three-up" title="drag" aria-hidden="true"></span>
+
+					<BlazoredTextEditor @ref="@post.EditorInstance" Theme="bubble">
+						<ToolbarContent>
+							<select class="ql-header">
+								<option selected=""></option>
+								<option value="1"></option>
+								<option value="2"></option>
+								<option value="3"></option>
+								<option value="4"></option>
+								<option value="5"></option>
+							</select>
+							<span class="ql-formats">
+								<button class="ql-bold"></button>
+								<button class="ql-italic"></button>
+								<button class="ql-underline"></button>
+								<button class="ql-strike"></button>
+							</span>
+							<span class="ql-formats">
+								<select class="ql-color"></select>
+								<select class="ql-background"></select>
+							</span>
+							<span class="ql-formats">
+								<button class="ql-list" value="ordered"></button>
+								<button class="ql-list" value="bullet"></button>
+							</span>
+							<span class="ql-formats">
+								<button class="ql-link"></button>
+							</span>
+						</ToolbarContent>
+						<EditorContent>
+							@((MarkupString)post.Content)
+						</EditorContent>
+					</BlazoredTextEditor>
+				</div>
+			</article>
+		}
 	</section>
 }

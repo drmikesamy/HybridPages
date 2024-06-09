@@ -1,6 +1,8 @@
-﻿using HybridPages.Shared.Enums;
+﻿using Blazored.TextEditor;
+using HybridPages.Shared.Enums;
 using HybridPages.Shared.Helpers;
 using HybridPages.Shared.Models;
+using System.ComponentModel;
 using System.Net.Http.Json;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Net.WebRequestMethods;
@@ -15,6 +17,7 @@ namespace HybridPages.Client.State
 		}
 		public Page? Page { get; set; }
 		public Post? SelectedPost { get; set; }
+		public Post? Payload { get; set; }
 
 		public event Action OnStateChange;
 		public async Task Get(string uniqueName)
@@ -23,7 +26,7 @@ namespace HybridPages.Client.State
 			if (response.IsSuccessStatusCode)
 			{
 				Page = await response.Content.ReadFromJsonAsync<Page>();
-			}
+            }
 			NotifyStateChanged();
 		}
 		public async Task AddPost(PostTypeEnum postType)
@@ -45,6 +48,7 @@ namespace HybridPages.Client.State
 		}
 		public void SelectPost(Post post)
 		{
+
 			SelectedPost = post;
 			NotifyStateChanged();
 		}
@@ -80,5 +84,12 @@ namespace HybridPages.Client.State
 			NotifyStateChanged();
 		}
 		public void NotifyStateChanged() => OnStateChange?.Invoke();
+
+
+		public Post? DragDropPayload { get; set; }
+
+		public Post? DragDropTarget { get; set; }
+
+		public int? ActiveSpacerId { get; set; }
 	}
 }

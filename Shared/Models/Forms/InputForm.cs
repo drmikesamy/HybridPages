@@ -1,9 +1,4 @@
-﻿using HybridPages.Shared.Enums;
-using SimpleTextEditor.Helpers;
-using SimpleTextEditor.Models;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace HybridPages.Shared.Models.Forms
+﻿namespace HybridPages.Shared.Models.Forms
 {
     public class InputForm : BaseEntity<InputForm>
     {

@@ -6,6 +6,8 @@ namespace HybridPages.Client.Pages
 {
 	public partial class Index
 	{
+		private IGrouping<string,Post> DropedItem;
+		private IGrouping<string, Post> replacedItem;
 		[Parameter]
 		public string? UniqueName { get; set; }
 
@@ -32,6 +34,16 @@ namespace HybridPages.Client.Pages
 		public void SelectPost(Post post)
 		{
 			_pageService.SelectedPost = post;
+			StateHasChanged();
+		}
+		public void OnItemDrop(IGrouping<string, Post> post)
+		{
+			DropedItem = post;
+			StateHasChanged();
+		}
+		public void OnReplacedItemDrop(IGrouping<string, Post> post)
+		{
+			replacedItem = post;
 			StateHasChanged();
 		}
 	}

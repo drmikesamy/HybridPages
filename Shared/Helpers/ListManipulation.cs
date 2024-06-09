@@ -29,6 +29,14 @@ namespace HybridPages.Shared.Helpers
 			}
 			return list;
 		}
+		public static void Swap(Post? item1, Post? item2)
+		{
+			if(item1 == null || item2 == null) return;
+
+			Post temp = item1;
+			item1 = item2;
+			item2 = temp;
+		}
 		public static LinkedListNode<Post>? FindById(LinkedList<Post> list, long id)
 		{
 			var currentNode = list.First;

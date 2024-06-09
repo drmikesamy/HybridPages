@@ -14,15 +14,16 @@ body {
     background-attachment: fixed;
     background-size: 100vw 100vh;
     @include blues-and-purples-meshed-background;
+    @include fullwidth-centred-content;
 }
 
 .content-container {
     @include default-row-grid;
 
-    & > section, & > nav {
-        @include fullwidth-centred-content;
+    & > section {
+        @include responsive-article-flow;
 
-        & > article, & > ul {
+        & > article {
             @include responsive-content-padding;
         }
     }

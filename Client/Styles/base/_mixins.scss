@@ -157,8 +157,18 @@
 @mixin fullwidth-centred-content {
 	display: grid;
 	justify-items: center;
+
 	& > * {
 		@include responsive-max-width;
 		width: 100%;
 	}
+}
+
+@mixin responsive-article-flow {
+	display: grid;
+	--min: 30ch;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--min)), 1fr));
+	@include responsive-max-width;
+
 }

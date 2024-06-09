@@ -12,6 +12,7 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using System.Text.Json;
+@using Plk.Blazor.DragDrop;
 @inject NavigationManager _navigation
 @inject PageService _pageService
 
@@ -24,13 +25,16 @@
 	}
 	else
 	{
-		@foreach (var post in _pageService.Page.Posts)
-		{
-			<ContentSection post="@post"></ContentSection>
-		}
+		<Dropzone Items="_pageService.Page.Posts.GroupBy(p => p.ChainedRow).ToList()" InstantReplace="true" TItem="IGrouping<string,Post>" OnItemDrop="@((p)=>OnItemDrop(p))" OnReplacedItemDrop="@((p)=>OnReplacedItemDrop(p))">
+			<ContentSection postGroup="@context"></ContentSection>
+		</Dropzone>
 	}
 </div>
 
-
+<div style="position: fixed; left:0px; top: 0px; right: 0px; background-color: red;">
+	<p>Selected: @_pageService.DragDropPayload?.Content</p>
+	<p>Target: @_pageService.DragDropTarget?.Content</p>
+</div>
 @* @(JsonSerializer.Serialize(_pageService.Page, new JsonSerializerOptions() { WriteIndented = true })) *@
+
 

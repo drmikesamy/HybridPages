@@ -3,7 +3,6 @@
 @using HybridPages.Shared.Interfaces;
 @using HybridPages.Shared.Models;
 @using HybridPages.Shared.Helpers;
-@using SimpleTextEditor;
 @using HybridPages.Client.Shared.EditorComponents.Forms;
 @inject PageService _pageService;
 
@@ -22,38 +21,7 @@
 			</nav>
 			<section class="section-editor">
 				<article>
-					@switch (_pageService.SelectedPost?.Type)
-					{
-						case PostTypeEnum.JumboBanner:
-							<input type="text" @bind-value="Content" @bind-value:event="oninput" />
-							break;
-						case PostTypeEnum.Image:
-							<input type="text" @bind-value="Content" @bind-value:event="oninput" />
-							break;
-						case PostTypeEnum.Vimeo:
-						case PostTypeEnum.YouTube:
-							<div>URL:</div>
-							<input type="text" @bind-value="Content" @bind-value:event="oninput" />
-							break;
-						case PostTypeEnum.Form:
-							<FormEditor></FormEditor>
-							break;
-						default:
-							<TextEditor @bind-Blocks="TextBlocks"></TextEditor>
-							break;
-					}
-					<br /><br />
-					<hr>
-					
-					@if (_pageService.SelectedPost?.Id != _pageService.Page?.Posts?.First?.Value.Id)
-					{
-						<button @onclick="_pageService.MoveUp">Move Up</button>
-					}
-					@if (_pageService.SelectedPost?.Id != _pageService.Page?.Posts?.Last?.Value.Id)
-					{
-						<button @onclick="_pageService.MoveDown">Move Down</button>
-					}
-					<button @onclick="() => _pageService.AddPost(PostTypeEnum.Text)">Add Text Section</button>
+					<RichTextEditor></RichTextEditor>
 				</article>
 			</section>
 		</Authorized>
