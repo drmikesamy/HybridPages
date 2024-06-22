@@ -9,25 +9,11 @@
 
 @if (postGroup != null)
 {
-
-	@if (_pageService.DragDropTarget?.ChainedRow == postGroup.First().ChainedRow)
-	{
-		<section>
-			<article>
-				spacer
-			</article>
-		</section>
-	}
 	<section>
 		@foreach (var post in postGroup)
 		{
-			<article class="@(post.Type.ToString().ToKebabCase())"
-					 draggable="true"
-					 @ondragstart="@(() => DragStart(post))"
-					 @ondragenter="() => DragEnter(post)"
-					 @ondrop="() => Drop()"
-					 @ondragleave="() => DragLeave()">
-				<div style="pointer-events:none">
+			<article class="@(post.Type.ToString().ToKebabCase())">
+				<div>
 					<span class="oi oi-grid-three-up" title="drag" aria-hidden="true"></span>
 
 					<BlazoredTextEditor @ref="@post.EditorInstance" Theme="bubble">
